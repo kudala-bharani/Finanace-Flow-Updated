@@ -55,6 +55,14 @@ A modern, full-stack personal finance management application built with React, T
 - **Payment Status**: Mark transactions as completed
 - **Friend Management**: Organize transactions by person
 
+### 💱 Smart Currency & Hover Conversion
+
+- **Hover-to-convert**: Move your cursor over any monetary value to instantly preview it in your chosen target currency.
+- **Sitewide currency**: Set the default currency for the entire app based on your preference.
+- **Conversion toggle**: Turn the on-hover conversion behavior on or off anytime.
+- **Target currency**: Pick which currency is shown on hover when conversion is enabled.
+- **Managed in Settings**: Go to `Settings → Currency` to configure preferences; they persist locally per device.
+
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -231,6 +239,14 @@ For testing purposes, you can use these sample credentials:
 5. **Set Budget Goals**: Create monthly budget targets for different categories
 6. **Create Savings Goals**: Set financial goals with target amounts and dates
 7. **Manage Friends**: Track money owed to and from friends
+
+### Currency Preferences
+
+- **Preferred Currency**: Controls the currency shown across the entire UI.
+- **Enable Hover Conversion**: When enabled, hovering a money value shows it in the target currency.
+- **Target Currency**: The currency used for the on-hover preview.
+
+All of the above are configurable in `Settings → Currency`.
 
 ### Key Features
 
