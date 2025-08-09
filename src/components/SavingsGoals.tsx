@@ -5,6 +5,7 @@ import { useFinanceData } from '@/hooks/useFinanceData';
 import { DatePicker } from "./ui/datepicker";
 import { Money } from "./Money";
 import { useToast } from '@/hooks/use-toast';
+import { PageHeader } from "./PageHeader";
 
 export interface SavingsGoal {
   id: string;
@@ -91,19 +92,19 @@ export const SavingsGoals = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-card-foreground">Savings Goals</h1>
-          <p className="text-slate-400">Track your progress toward financial goals</p>
-        </div>
-        <button
-          onClick={() => setIsFormOpen(true)}
-          className="flex items-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus size={20} />
-          <span>Add Goal</span>
-        </button>
-      </div>
+      <PageHeader
+        title="Savings Goals"
+        subtitle="Track your progress toward financial goals"
+        actions={(
+          <button
+            onClick={() => setIsFormOpen(true)}
+            className="flex items-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <Plus size={20} />
+            <span>Add Goal</span>
+          </button>
+        )}
+      />
 
       {/* Goals Grid */}
       {savingsGoals.length === 0 ? (

@@ -3,6 +3,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { TrendingUp, TrendingDown, Calculator, Target } from 'lucide-react';
 import { SummaryCard } from './ui/card';
+import { PageHeader } from './PageHeader';
 import React from 'react';
 import { Money } from "./Money";
 
@@ -137,10 +138,11 @@ export const EnhancedAnalytics = () => {
 
   return (
     <div className="space-y-8">
-      <div className="mb-4">
-        <h1 className="text-3xl font-bold text-card-foreground">Enhanced Analytics</h1>
-        <p className="text-muted-foreground">Advanced charts and trends for deeper financial analysis</p>
-      </div>
+      <PageHeader
+        title="Enhanced Analytics"
+        subtitle="Advanced charts and trends for deeper financial analysis"
+        breadcrumbs={[{ label: 'Home', href: '/dashboard' }, { label: 'Enhanced Analytics' }]}
+      />
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
         <SummaryCard

@@ -25,6 +25,7 @@ import {
   Legend as RechartsLegend,
 } from "recharts";
 import { SummaryCard } from "./ui/card";
+import { PageHeader } from "./PageHeader";
 import {
   Select,
   SelectTrigger,
@@ -193,16 +194,12 @@ export const FriendTransactions = () => {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-card-foreground">
-            Friend Transactions
-          </h1>
-          <p className="text-muted-foreground mb-4">
-            Track money to receive and give
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <PageHeader
+        title="Friend Transactions"
+        subtitle="Track money to receive and to give"
+        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Friends" }]}
+        actions={
+          <div className="flex gap-2">
           <button
             onClick={() => setIsFormOpen(true)}
             className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -348,9 +345,10 @@ export const FriendTransactions = () => {
                 </div>
               </div>
             </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+            </Dialog>
+          </div>
+        }
+      />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
         <SummaryCard
           icon={<Users className="w-7 h-7" />}

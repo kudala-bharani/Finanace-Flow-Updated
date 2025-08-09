@@ -19,6 +19,7 @@ import {
   SelectItem,
 } from "./ui/select";
 import { Money } from "./Money";
+import { PageHeader } from "./PageHeader";
 
 const sectionStyles = {
   bank: {
@@ -224,13 +225,11 @@ export const AccountsManager = () => {
 
   return (
     <div className="space-y-6">
-      {/* Heading and description */}
-      <div className="mb-2">
-        <h1 className="text-3xl font-bold text-card-foreground">Accounts</h1>
-        <p className="text-muted-foreground">
-          View and manage all your financial accounts and balances in one place.
-        </p>
-      </div>
+      <PageHeader
+        title="Accounts"
+        subtitle="Manage bank, cash, coins and friend balances"
+        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Accounts" }]}
+      />
 
       {/* Top summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

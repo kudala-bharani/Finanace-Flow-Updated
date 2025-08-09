@@ -27,6 +27,7 @@ import {
 } from "./ui/select";
 import { DatePicker } from "./ui/datepicker";
 import { Money } from "./Money";
+import { PageHeader } from "./PageHeader";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -261,16 +262,12 @@ export const ExpenseTracker = () => {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-card-foreground">
-            Expense Tracker
-          </h1>
-          <p className="text-muted-foreground mb-4">
-            Track your spending and expenses
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <PageHeader
+        title="Expenses"
+        subtitle="Track your spending and expenses"
+        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Expenses" }]}
+        actions={
+          <div className="flex gap-2">
           <button
             onClick={() => setIsFormOpen(true)}
             className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
@@ -410,10 +407,11 @@ export const ExpenseTracker = () => {
                 </div>
               </div>
             </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+            </Dialog>
+          </div>
+        }
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 mt-4">
         <SummaryCard
           icon={<TrendingDown className="w-7 h-7" />}
           title="This Month"

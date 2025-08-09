@@ -107,6 +107,8 @@ All colors MUST be HSL.
   }
 }
 
+/* (removed density utilities) */
+
 /* Hide number input spinners for Chrome, Safari, Edge, Opera */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {

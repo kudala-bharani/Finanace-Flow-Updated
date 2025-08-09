@@ -28,6 +28,7 @@ import {
 } from "./ui/select";
 import { DatePicker } from "./ui/datepicker";
 import { Money } from "./Money";
+import { PageHeader } from "./PageHeader";
 
 function WelcomeMessage() {
   let name = "";
@@ -360,11 +361,12 @@ export const Dashboard = () => {
 
   return (
     <div className="space-y-4 lg:space-y-6">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-card-foreground mb-2">
-          Dashboard
-        </h1>
-        {/* Welcome message with user name */}
+      <PageHeader
+        title="Dashboard"
+        subtitle="Overview and quick actions"
+        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Dashboard" }]}
+      />
+      <div className="mt-2">
         <WelcomeMessage />
       </div>
 

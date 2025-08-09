@@ -10,6 +10,7 @@ import {
   SelectItem,
 } from "./ui/select";
 import { Money } from "./Money";
+import { PageHeader } from "./PageHeader";
 import { useToast } from "@/hooks/use-toast";
 
 // Add category color mapping (same order as categories)
@@ -316,23 +317,19 @@ export const BudgetGoals = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-card-foreground">
-            Budget Goals
-          </h1>
-          <p className="text-muted-foreground">
-            Set and track your monthly spending goals
-          </p>
-        </div>
-        <button
-          onClick={() => setIsFormOpen(true)}
-          className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
-        >
-          <Plus size={20} />
-          <span>Set Budget</span>
-        </button>
-      </div>
+      <PageHeader
+        title="Budget Goals"
+        subtitle="Set and track your monthly spending goals"
+        actions={(
+          <button
+            onClick={() => setIsFormOpen(true)}
+            className="flex items-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            <Plus size={20} />
+            <span>Set Budget</span>
+          </button>
+        )}
+      />
 
       {/* Previous Month Summary */}
       {previousGoals.length > 0 && (

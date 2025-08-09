@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { SummaryCard } from './ui/card';
+import { PageHeader } from './PageHeader';
 import { TrendingUp, TrendingDown, Wallet, BarChart3 } from 'lucide-react';
 import React from 'react';
 import { Money } from "./Money";
@@ -124,10 +125,11 @@ export const Analytics = () => {
 
   return (
     <div className="space-y-8">
-      <div className="mb-4">
-        <h1 className="text-3xl font-bold text-card-foreground">Analytics</h1>
-        <p className="text-muted-foreground">Visual insights into your financial data</p>
-      </div>
+      <PageHeader
+        title="Analytics"
+        subtitle="Visual insights into your financial data"
+        breadcrumbs={[{ label: 'Home', href: '/dashboard' }, { label: 'Analytics' }]}
+      />
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
