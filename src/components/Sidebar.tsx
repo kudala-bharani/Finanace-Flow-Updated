@@ -140,25 +140,25 @@ export const Sidebar = ({
             }`}
           >
             {/* Brand */}
-            <button
-              className="flex items-center gap-2 select-none cursor-pointer focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-1"
-              aria-label="Go to Dashboard"
-              onClick={() => {
-                setActiveSection("dashboard");
-                setIsOpen(false);
-              }}
-            >
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png"
-                alt="Finance Logo"
-                className="w-5 h-5 lg:w-6 lg:h-6"
-              />
-              {!(!mobileFullscreen && isCollapsed) && (
+            {!(!mobileFullscreen && isCollapsed) && (
+              <button
+                className="flex items-center gap-2 select-none cursor-pointer focus-visible:ring-2 focus-visible:ring-primary rounded-lg p-1"
+                aria-label="Go to Dashboard"
+                onClick={() => {
+                  setActiveSection("dashboard");
+                  setIsOpen(false);
+                }}
+              >
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png"
+                  alt="Finance Logo"
+                  className="w-5 h-5 lg:w-6 lg:h-6"
+                />
                 <span className="text-lg lg:text-xl font-bold text-primary">
                   Finance
                 </span>
-              )}
-            </button>
+              </button>
+            )}
 
             {/* Collapse/Expand toggle (desktop-only) */}
             {!mobileFullscreen && (
@@ -188,7 +188,7 @@ export const Sidebar = ({
                       onClick={() => setIsCollapsed(false)}
                       className="p-1 lg:p-1.5 rounded-lg hover:bg-muted transition-colors"
                     >
-                      <PanelLeftOpen size={20} className="lg:w-5 lg:h-5" />
+                      <PanelLeftOpen size={18} className="lg:w-4 lg:h-4" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent
