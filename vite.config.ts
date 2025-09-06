@@ -9,11 +9,10 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 5173,
   },
-  plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
+  base: process.env.NODE_ENV === "production" ? "/Finanace-Flow-Updated/" : "/",
+  plugins: [react(), mode === "development" && componentTagger()].filter(
+    Boolean
+  ),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
