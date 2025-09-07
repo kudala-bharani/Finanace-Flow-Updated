@@ -1,0 +1,58 @@
+name: finance-flow
+services:
+  # Backend API Service
+  - name: backend
+    source_dir: /backend
+    github:
+      repo: your-username/Finanace-Flow-Updated
+      branch: main
+    run_command: node index.mjs
+    environment_slug: node-js
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    http_port: 4000
+    envs:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        value: ${JWT_SECRET}
+        type: SECRET
+      - key: CONTACT_EMAIL_USER
+        value: ${CONTACT_EMAIL_USER}
+        type: SECRET
+      - key: CONTACT_EMAIL_PASS
+        value: ${CONTACT_EMAIL_PASS}
+        type: SECRET
+      - key: DATABASE_URL
+        value: ${DATABASE_URL}
+        type: SECRET
+    health_check:
+      http_path: /
+      initial_delay_seconds: 10
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+
+# Database
+databases:
+  - name: finance-flow-db
+    engine: PG
+    version: "15"
+    size: db-s-dev-database
+    num_nodes: 1
+
+# Static Site for Frontend
+static_sites:
+  - name: frontend
+    source_dir: /
+    github:
+      repo: your-username/Finanace-Flow-Updated
+      branch: main
+    build_command: npm ci && npm run build
+    output_dir: dist
+    routes:
+      - path: /
+    envs:
+      - key: VITE_API_URL
+        value: ${VITE_API_URL}

@@ -5,7 +5,12 @@
   "type": "module",
   "main": "index.mjs",
   "scripts": {
-    "dev": "node index.mjs"
+    "dev": "node index.mjs",
+    "start": "node index.mjs",
+    "build": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:migrate": "npx prisma migrate deploy",
+    "db:seed": "node seed-iron-man-data.js"
   },
   "keywords": [],
   "author": "",
