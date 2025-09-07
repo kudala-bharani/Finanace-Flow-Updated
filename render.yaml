@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: finance-flow-backend
+    env: node
+    plan: free
+    buildCommand: npm ci && npx prisma generate
+    startCommand: node index.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CONTACT_EMAIL_USER
+        sync: false
+      - key: CONTACT_EMAIL_PASS
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+
+  - type: web
+    name: finance-flow-frontend
+    env: static
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://finance-flow-backend.onrender.com
