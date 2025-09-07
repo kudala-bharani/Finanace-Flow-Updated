@@ -1,3 +1,4 @@
+import { useState, useContext, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,7 +18,6 @@ import NotFound from "./pages/NotFound";
 import { ExchangeRateProvider } from "./lib/ExchangeRateContext";
 import { SettingsProvider, SettingsContext } from "./lib/SettingsContext";
 import { useApplyTheme } from "./hooks/useApplyTheme";
-import { useContext, useEffect } from "react";
 import { Dashboard } from "./components/Dashboard";
 import { AccountsManager } from "./components/AccountsManager";
 import { IncomeTracker } from "./components/IncomeTracker";
@@ -30,212 +30,18 @@ import { EnhancedAnalytics } from "./components/EnhancedAnalytics";
 import { SmartSearch } from "./components/SmartSearch";
 import Settings from "./pages/Settings";
 import { Sidebar } from "./components/Sidebar";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { login, signup } from "./lib/api";
 import { useToast } from "@/hooks/use-toast";
-import { ProtectedRoute } from "./components/ProtectedRoute";
 
-const queryClient = new QueryClient();
+// ---------- Protected Route ----------
+const isAuthenticated = () => !!localStorage.getItem("token");
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  if (!isAuthenticated()) return <Navigate to="/login" replace />;
+  return <>{children}</>;
+};
 
-function AppWithTheme() {
-  const { settings } = useContext(SettingsContext);
-  useApplyTheme(settings.theme as "dark" | "light" | "system");
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
-  // Keyboard shortcuts handler
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Only handle shortcuts when not typing in input fields
-      if (
-        event.target instanceof HTMLInputElement ||
-        event.target instanceof HTMLTextAreaElement
-      ) {
-        return;
-      }
-
-      // Check for Ctrl key combinations
-      if (event.ctrlKey) {
-        switch (event.key.toLowerCase()) {
-          case "d":
-            event.preventDefault();
-            navigate("/dashboard");
-            break;
-          case "i":
-            if (!event.shiftKey) {
-              event.preventDefault();
-              navigate("/income");
-            }
-            break;
-          case "e":
-            event.preventDefault();
-            navigate("/expenses");
-            break;
-        }
-      }
-    };
-
-    // Add event listener
-    window.addEventListener("keydown", handleKeyDown);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [navigate]);
-
-  return (
-    <>
-      <Toaster />
-      <Sonner />
-      <Routes>
-        {/* Home, About, Contact, Login, Signup: no sidebar, full page */}
-        <Route path="/" element={<Index />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/signup" element={<SignupForm />} />
-        {/* All other routes: sidebar layout, protected */}
-        <Route
-          path="*"
-          element={
-            <ProtectedRoute>
-              <div className="flex h-screen bg-background text-foreground">
-                {/* Sidebar - hidden on mobile, visible on desktop */}
-                <div className="hidden lg:block h-screen flex-shrink-0">
-                  <Sidebar
-                    activeSection={
-                      location.pathname.replace("/", "") || "dashboard"
-                    }
-                    setActiveSection={(section) => navigate("/" + section)}
-                    isOpen={isSidebarOpen}
-                    setIsOpen={setIsSidebarOpen}
-                    isCollapsed={isSidebarCollapsed}
-                    setIsCollapsed={setIsSidebarCollapsed}
-                  />
-                </div>
-
-                {/* Mobile sidebar overlay */}
-                {isSidebarOpen && (
-                  <div className="lg:hidden fixed inset-0 z-50">
-                    <div
-                      className="fixed inset-0 bg-black/50"
-                      onClick={() => setIsSidebarOpen(false)}
-                    />
-                    {/* Fullscreen mobile menu from top */}
-                    <div className="fixed inset-x-0 top-0 bottom-0 bg-background z-50 flex flex-col">
-                      <div className="flex items-center justify-between p-4 border-b border-border">
-                        <div className="flex items-center gap-2">
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png"
-                            alt="Finance Logo"
-                            className="w-6 h-6"
-                          />
-                          <span className="text-lg font-bold text-primary">Finance</span>
-                        </div>
-                        <button
-                          onClick={() => setIsSidebarOpen(false)}
-                          className="p-2 rounded-lg hover:bg-muted"
-                          aria-label="Close menu"
-                        >
-                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                      <div className="flex-1 overflow-y-auto">
-                        <Sidebar
-                          activeSection={
-                            location.pathname.replace("/", "") || "dashboard"
-                          }
-                          setActiveSection={(section) => {
-                            navigate("/" + section);
-                            setIsSidebarOpen(false);
-                          }}
-                          isOpen={isSidebarOpen}
-                          setIsOpen={setIsSidebarOpen}
-                          isCollapsed={false}
-                          setIsCollapsed={setIsSidebarCollapsed}
-                          mobileFullscreen
-                          hideHeader
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Main content area */}
-                <div className="flex-1 flex flex-col h-screen min-w-0">
-                  {/* Mobile header with menu button */}
-                  <header className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-background">
-                    <div className="flex items-center gap-2">
-                      <img
-                        src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png"
-                        alt="Finance Logo"
-                        className="w-6 h-6"
-                      />
-                      <span className="text-lg font-bold text-primary">
-                        Finance
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => setIsSidebarOpen(true)}
-                      className="p-2 rounded-lg hover:bg-muted transition-colors"
-                      aria-label="Open menu"
-                    >
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 6h16M4 12h16M4 18h16"
-                        />
-                      </svg>
-                    </button>
-                  </header>
-
-                  <main className="flex-1 overflow-y-auto h-full">
-                    <div className="px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4 lg:py-6 xl:py-8 max-w-7xl w-full mx-auto">
-                      <Routes>
-                        <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/accounts" element={<AccountsManager />} />
-                        <Route path="/income" element={<IncomeTracker />} />
-                        <Route path="/expenses" element={<ExpenseTracker />} />
-                        <Route
-                          path="/friends"
-                          element={<FriendTransactions />}
-                        />
-                        <Route path="/budget" element={<BudgetGoals />} />
-                        <Route path="/savings" element={<SavingsGoals />} />
-                        <Route path="/analytics" element={<Analytics />} />
-                        <Route
-                          path="/enhanced-analytics"
-                          element={<EnhancedAnalytics />}
-                        />
-                        <Route path="/search" element={<SmartSearch />} />
-                        <Route path="/settings" element={<Settings />} />
-                      </Routes>
-                    </div>
-                  </main>
-                </div>
-              </div>
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </>
-  );
-}
-
-// Add simple LoginForm and SignupForm components
+// ----- Login & Signup Forms -----
 function LoginForm() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -261,7 +67,7 @@ function LoginForm() {
                 description: `Welcome, ${result.user.name}!`,
               });
               navigate("/dashboard");
-            } catch (err) {
+            } catch {
               setError("Invalid email or password");
             } finally {
               setLoading(false);
@@ -338,7 +144,6 @@ function SignupForm() {
       .then((result) => {
         localStorage.setItem("token", result.token);
         localStorage.setItem("user", JSON.stringify(result.user));
-        // Clear any existing friend data for new users
         localStorage.removeItem("friendNames");
         toast({
           title: "Signup successful",
@@ -417,8 +222,186 @@ function SignupForm() {
   );
 }
 
-// Wrap the app with GoogleOAuthProvider at the top level
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE"; // TODO: Replace with your real client ID from Google Cloud Console
+// ---------- Main App Theme Wrapper ----------
+function AppWithTheme() {
+  const { settings } = useContext(SettingsContext);
+  useApplyTheme(settings.theme as "dark" | "light" | "system");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+      if (event.ctrlKey) {
+        switch (event.key.toLowerCase()) {
+          case "d":
+            event.preventDefault();
+            navigate("/dashboard");
+            break;
+          case "i":
+            if (!event.shiftKey) {
+              event.preventDefault();
+              navigate("/income");
+            }
+            break;
+          case "e":
+            event.preventDefault();
+            navigate("/expenses");
+            break;
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [navigate]);
+
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <Routes>
+        {/* Public pages */}
+        <Route path="/" element={<Index />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/signup" element={<SignupForm />} />
+        {/* Protected sidebar+main routes */}
+        <Route
+          path="*"
+          element={
+            <ProtectedRoute>
+              <div className="flex h-screen bg-background text-foreground">
+                {/* Sidebar */}
+                <div className="hidden lg:block h-screen flex-shrink-0">
+                  <Sidebar
+                    activeSection={
+                      location.pathname.replace("/", "") || "dashboard"
+                    }
+                    setActiveSection={(section) => navigate("/" + section)}
+                    isOpen={isSidebarOpen}
+                    setIsOpen={setIsSidebarOpen}
+                    isCollapsed={isSidebarCollapsed}
+                    setIsCollapsed={setIsSidebarCollapsed}
+                  />
+                </div>
+                {/* Mobile sidebar overlay */}
+                {isSidebarOpen && (
+                  <div className="lg:hidden fixed inset-0 z-50">
+                    <div
+                      className="fixed inset-0 bg-black/50"
+                      onClick={() => setIsSidebarOpen(false)}
+                    />
+                    <div className="fixed inset-x-0 top-0 bottom-0 bg-background z-50 flex flex-col">
+                      <div className="flex items-center justify-between p-4 border-b border-border">
+                        <div className="flex items-center gap-2">
+                          <img
+                            src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png"
+                            alt="Finance Logo"
+                            className="w-6 h-6"
+                          />
+                          <span className="text-lg font-bold text-primary">
+                            Finance
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setIsSidebarOpen(false)}
+                          className="p-2 rounded-lg hover:bg-muted"
+                          aria-label="Close menu"
+                        >
+                          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                      <div className="flex-1 overflow-y-auto">
+                        <Sidebar
+                          activeSection={
+                            location.pathname.replace("/", "") ||
+                            "dashboard"
+                          }
+                          setActiveSection={(section) => {
+                            navigate("/" + section);
+                            setIsSidebarOpen(false);
+                          }}
+                          isOpen={isSidebarOpen}
+                          setIsOpen={setIsSidebarOpen}
+                          isCollapsed={false}
+                          setIsCollapsed={setIsSidebarCollapsed}
+                          mobileFullscreen
+                          hideHeader
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {/* Main content area */}
+                <div className="flex-1 flex flex-col h-screen min-w-0">
+                  <header className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-background">
+                    <div className="flex items-center gap-2">
+                      <img
+                        src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png"
+                        alt="Finance Logo"
+                        className="w-6 h-6"
+                      />
+                      <span className="text-lg font-bold text-primary">
+                        Finance
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setIsSidebarOpen(true)}
+                      className="p-2 rounded-lg hover:bg-muted transition-colors"
+                      aria-label="Open menu"
+                    >
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 6h16M4 12h16M4 18h16"
+                        />
+                      </svg>
+                    </button>
+                  </header>
+                  <main className="flex-1 overflow-y-auto h-full">
+                    <div className="px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4 lg:py-6 xl:py-8 max-w-7xl w-full mx-auto">
+                      <Routes>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/accounts" element={<AccountsManager />} />
+                        <Route path="/income" element={<IncomeTracker />} />
+                        <Route path="/expenses" element={<ExpenseTracker />} />
+                        <Route path="/friends" element={<FriendTransactions />} />
+                        <Route path="/budget" element={<BudgetGoals />} />
+                        <Route path="/savings" element={<SavingsGoals />} />
+                        <Route path="/analytics" element={<Analytics />} />
+                        <Route path="/enhanced-analytics" element={<EnhancedAnalytics />} />
+                        <Route path="/search" element={<SmartSearch />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </div>
+                  </main>
+                </div>
+              </div>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
+  );
+}
+
+const queryClient = new QueryClient();
 
 const App = () => (
   <SettingsProvider>
