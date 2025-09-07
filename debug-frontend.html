@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Frontend</title>
+  </head>
+  <body>
+    <h1>Frontend Debug Test</h1>
+    <div id="debug-info">
+      <h2>Environment Variables:</h2>
+      <p>VITE_API_URL: <span id="api-url">Loading...</span></p>
+      <p>Current URL: <span id="current-url">Loading...</span></p>
+      <p>User Agent: <span id="user-agent">Loading...</span></p>
+    </div>
+
+    <div id="test-results">
+      <h2>API Test:</h2>
+      <button onclick="testAPI()">Test Backend API</button>
+      <div id="api-result">Click button to test</div>
+    </div>
+
+    <script>
+      // Display current environment info
+      document.getElementById('api-url').textContent = import.meta.env.VITE_API_URL || 'Not set';
+      document.getElementById('current-url').textContent = window.location.href;
+      document.getElementById('user-agent').textContent = navigator.userAgent;
+
+      async function testAPI() {
+          const resultDiv = document.getElementById('api-result');
+          resultDiv.innerHTML = 'Testing...';
+
+          try {
+              const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+              const response = await fetch(apiUrl);
+              const data = await response.json();
+              resultDiv.innerHTML = `✅ API Response: ${JSON.stringify(data)}`;
+          } catch (error) {
+              resultDiv.innerHTML = `❌ API Error: ${error.message}`;
+          }
+      }
+    </script>
+  </body>
+</html>

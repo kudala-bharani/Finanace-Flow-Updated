@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 5173,
   },
-  base: process.env.NODE_ENV === "production" ? "/Finanace-Flow-Updated/" : "/",
+  base: "/",
   plugins: [react(), mode === "development" && componentTagger()].filter(
     Boolean
   ),
