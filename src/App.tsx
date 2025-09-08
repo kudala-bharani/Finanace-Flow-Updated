@@ -106,7 +106,12 @@ function LoginForm() {
         </form>
         <p className="mt-4 text-center text-sm">
           Don't have an account?{" "}
-          <a href="/signup" className="text-emerald-500 underline">Sign up</a>
+          <button 
+            onClick={() => navigate('/signup')} 
+            className="text-emerald-500 underline hover:text-emerald-600"
+          >
+            Sign up
+          </button>
         </p>
       </div>
     </div>
@@ -165,7 +170,12 @@ function SignupForm() {
         </form>
         <p className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <a href="/login" className="text-emerald-500 underline">Login</a>
+          <button 
+            onClick={() => navigate('/login')} 
+            className="text-emerald-500 underline hover:text-emerald-600"
+          >
+            Login
+          </button>
         </p>
       </div>
     </div>
@@ -257,7 +267,11 @@ function AppWithTheme() {
             <BrowserRouter>
               <Routes>
                 {/* Public */}
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={
+                  <div className="min-h-screen bg-background text-foreground">
+                    <Index />
+                  </div>
+                } />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<LoginForm />} />
