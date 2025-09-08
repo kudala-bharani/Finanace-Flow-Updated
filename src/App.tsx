@@ -311,152 +311,187 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
 // ---------- Main Theme Wrapper with Routes ----------
 function AppWithTheme() {
-  useApplyTheme();
+  return (
+    <SettingsProvider>
+      <AppWithThemeInner />
+    </SettingsProvider>
+  );
+}
+
+function AppWithThemeInner() {
+  const { settings } = useContext(SettingsContext);
+  useApplyTheme(settings.theme as "light" | "dark" | "system");
   const queryClient = new QueryClient();
 
   return (
-    <SettingsProvider>
-      <ExchangeRateProvider>
-        <TooltipProvider>
-          <QueryClientProvider client={queryClient}>
-            <BrowserRouter>
-              <Routes>
-                {/* Public */}
-                <Route
-                  path="/"
-                  element={
-                    <div className="min-h-screen bg-background text-foreground">
-                      <Index />
-                    </div>
-                  }
-                />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<LoginForm />} />
-                <Route path="/signup" element={<SignupForm />} />
+    <ExchangeRateProvider>
+      <TooltipProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+            <Routes>
+              {/* Public */}
+              <Route
+                path="/"
+                element={
+                  <div className="min-h-screen bg-background text-foreground">
+                    <Index />
+                  </div>
+                }
+              />
+              <Route
+                path="/about"
+                element={
+                  <div className="min-h-screen bg-background text-foreground">
+                    <About />
+                  </div>
+                }
+              />
+              <Route
+                path="/contact"
+                element={
+                  <div className="min-h-screen bg-background text-foreground">
+                    <Contact />
+                  </div>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <div className="min-h-screen bg-background text-foreground">
+                    <LoginForm />
+                  </div>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <div className="min-h-screen bg-background text-foreground">
+                    <SignupForm />
+                  </div>
+                }
+              />
 
-                {/* Protected Routes with Shared Layout */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Dashboard />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/accounts"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <AccountsManager />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/income"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <IncomeTracker />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/expenses"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <ExpenseTracker />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/friends"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <FriendTransactions />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/budget"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <BudgetGoals />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/savings"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <SavingsGoals />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/analytics"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Analytics />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/enhanced-analytics"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <EnhancedAnalytics />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/search"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <SmartSearch />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout>
-                        <Settings />
-                      </AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
+              {/* Protected Routes with Shared Layout */}
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Dashboard />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/accounts"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <AccountsManager />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/income"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <IncomeTracker />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/expenses"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <ExpenseTracker />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/friends"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <FriendTransactions />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/budget"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <BudgetGoals />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/savings"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <SavingsGoals />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analytics"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Analytics />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/enhanced-analytics"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <EnhancedAnalytics />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <SmartSearch />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Settings />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
 
-                {/* 404 */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-            <Toaster />
-            <Sonner />
-          </QueryClientProvider>
-        </TooltipProvider>
-      </ExchangeRateProvider>
-    </SettingsProvider>
+              {/* 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+          <Toaster />
+          <Sonner />
+        </QueryClientProvider>
+      </TooltipProvider>
+    </ExchangeRateProvider>
   );
 }
 
