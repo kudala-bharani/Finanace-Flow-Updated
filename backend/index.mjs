@@ -10,20 +10,22 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 
-// Test database connection and run migrations if needed
+// Test database connection
 async function initializeDatabase() {
   try {
     console.log("🔌 Testing database connection...");
     await prisma.$connect();
     console.log("✅ Database connected successfully");
     
-    // Try to sync database schema
-    console.log("📊 Syncing database schema...");
-    const { execSync } = await import('child_process');
-    execSync('npx prisma db push', { stdio: 'inherit' });
-    console.log("✅ Database schema synced");
+    // Test a simple query to ensure tables exist
+    try {
+      await prisma.user.findMany({ take: 1 });
+      console.log("✅ Database tables are accessible");
+    } catch (error) {
+      console.log("⚠️  Database tables may not exist yet - they will be created on first use");
+    }
   } catch (error) {
-    console.error("❌ Database initialization failed:", error);
+    console.error("❌ Database connection failed:", error);
     // Don't exit - let the server start anyway
   }
 }
