@@ -99,15 +99,21 @@ function LoginForm() {
             required
             className="w-full px-4 py-2 rounded border bg-muted text-foreground"
           />
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-          <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded" disabled={loading}>
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
+          <Button
+            type="submit"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login"}
           </Button>
         </form>
         <p className="mt-4 text-center text-sm">
           Don't have an account?{" "}
-          <button 
-            onClick={() => navigate('/signup')} 
+          <button
+            onClick={() => navigate("/signup")}
             className="text-emerald-500 underline hover:text-emerald-600"
           >
             Sign up
@@ -159,19 +165,53 @@ function SignupForm() {
       <div className="bg-card border border-border rounded-xl shadow-lg p-8 w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required className="w-full px-4 py-2 rounded border bg-muted text-foreground" />
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required className="w-full px-4 py-2 rounded border bg-muted text-foreground" />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required className="w-full px-4 py-2 rounded border bg-muted text-foreground" />
-          <input type="password" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="w-full px-4 py-2 rounded border bg-muted text-foreground" />
-          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-          <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded" disabled={loading}>
+          <input
+            type="text"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+          />
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+          />
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
+          <Button
+            type="submit"
+            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2 rounded"
+            disabled={loading}
+          >
             {loading ? "Signing up..." : "Sign Up"}
           </Button>
         </form>
         <p className="mt-4 text-center text-sm">
           Already have an account?{" "}
-          <button 
-            onClick={() => navigate('/login')} 
+          <button
+            onClick={() => navigate("/login")}
             className="text-emerald-500 underline hover:text-emerald-600"
           >
             Login
@@ -194,7 +234,8 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       if (
         event.target instanceof HTMLInputElement ||
         event.target instanceof HTMLTextAreaElement
-      ) return;
+      )
+        return;
       if (event.ctrlKey) {
         switch (event.key.toLowerCase()) {
           case "d":
@@ -231,7 +272,11 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       <div className="flex-1 flex flex-col h-screen min-w-0">
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-background">
           <div className="flex items-center gap-2">
-            <img src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png" alt="Logo" className="w-6 h-6" />
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png"
+              alt="Logo"
+              className="w-6 h-6"
+            />
             <span className="text-lg font-bold text-primary">Finance</span>
           </div>
           <button
@@ -239,8 +284,18 @@ function AppLayout({ children }: { children: React.ReactNode }) {
             className="p-2 rounded-lg hover:bg-muted"
             aria-label="Open menu"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
         </header>
@@ -267,11 +322,14 @@ function AppWithTheme() {
             <BrowserRouter>
               <Routes>
                 {/* Public */}
-                <Route path="/" element={
-                  <div className="min-h-screen bg-background text-foreground">
-                    <Index />
-                  </div>
-                } />
+                <Route
+                  path="/"
+                  element={
+                    <div className="min-h-screen bg-background text-foreground">
+                      <Index />
+                    </div>
+                  }
+                />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/login" element={<LoginForm />} />
