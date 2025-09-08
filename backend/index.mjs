@@ -43,33 +43,81 @@ function authenticateToken(req, res, next) {
   });
 }
 
-// Signup endpoint
+// Signup endpoint with logging and robust error handling
 app.post("/signup", async (req, res) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password)
-    return res.status(400).json({ error: "All fields required" });
+  try {
+    console.log("[POST /signup] body:", {
+      name: req.body?.name,
+      email: req.body?.email,
+      hasPassword: Boolean(req.body?.password),
+    });
 
-  // Convert email to lowercase for case-insensitive comparison
-  const emailLower = email.toLowerCase();
+    const { name, email, password } = req.body || {};
+    if (!name || !email || !password) {
+      console.log("[POST /signup] validation error: missing fields");
+      return res.status(400).json({ error: "All fields required" });
+    }
 
-  const existing = await prisma.user.findUnique({
-    where: { email: emailLower },
-  });
-  if (existing)
-    return res.status(409).json({ error: "Email already registered" });
-  const hashed = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
-    data: { name, email: emailLower, password: hashed },
-  });
-  const token = jwt.sign(
-    { userId: user.id, name: user.name, email: user.email },
-    JWT_SECRET,
-    { expiresIn: "7d" }
-  );
-  res.json({
-    token,
-    user: { id: user.id, name: user.name, email: user.email },
-  });
+    const emailLower = String(email).toLowerCase();
+
+    // Ensure DB connection
+    await prisma.$connect();
+
+    const existing = await prisma.user.findUnique({ where: { email: emailLower } });
+    if (existing) {
+      console.log("[POST /signup] email already registered:", emailLower);
+      return res.status(409).json({ error: "Email already registered" });
+    }
+
+    const hashed = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: { name, email: emailLower, password: hashed },
+    });
+
+    const token = jwt.sign(
+      { userId: user.id, name: user.name, email: user.email },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    console.log("[POST /signup] success for:", emailLower);
+    return res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+  } catch (error) {
+    console.error("[POST /signup] error:", error);
+    const message = error?.message || "Signup failed";
+    return res.status(500).json({ error: message });
+  }
+});
+
+// Debug endpoint to check DB connectivity and table state
+app.get("/debug/db", async (_req, res) => {
+  try {
+    const result = { connected: false, tables: {}, env: { hasDbUrl: Boolean(process.env.DATABASE_URL) } };
+    await prisma.$connect();
+    result.connected = true;
+    const [users, accounts, incomes, expenses, friends, budgets, savings] = await Promise.all([
+      prisma.user.count().catch(() => -1),
+      prisma.account.count().catch(() => -1),
+      prisma.income.count().catch(() => -1),
+      prisma.expense.count().catch(() => -1),
+      prisma.friendTransaction.count().catch(() => -1),
+      prisma.budgetGoal.count().catch(() => -1),
+      prisma.savingsGoal.count().catch(() => -1),
+    ]);
+    result.tables = {
+      User: users,
+      Account: accounts,
+      Income: incomes,
+      Expense: expenses,
+      FriendTransaction: friends,
+      BudgetGoal: budgets,
+      SavingsGoal: savings,
+    };
+    res.json(result);
+  } catch (error) {
+    console.error("[/debug/db] error:", error);
+    res.status(500).json({ connected: false, error: error?.message || String(error) });
+  }
 });
 
 // Login endpoint
