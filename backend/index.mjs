@@ -326,7 +326,9 @@ const PORT = process.env.PORT || 4000;
 
 console.log(`Starting server on port ${PORT}...`);
 console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-console.log(`Database URL configured: ${process.env.DATABASE_URL ? "Yes" : "No"}`);
+console.log(
+  `Database URL configured: ${process.env.DATABASE_URL ? "Yes" : "No"}`
+);
 
 const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Backend API server running on port ${PORT}`);
