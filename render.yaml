@@ -5,7 +5,7 @@ services:
     plan: free
     rootDir: backend
     buildCommand: npm ci && npx prisma generate
-    startCommand: npm run db:migrate && node index.mjs
+    startCommand: node index.mjs
     envVars:
       - key: NODE_ENV
         value: production
