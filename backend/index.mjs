@@ -10,6 +10,24 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 
+// Test database connection and run migrations if needed
+async function initializeDatabase() {
+  try {
+    console.log("🔌 Testing database connection...");
+    await prisma.$connect();
+    console.log("✅ Database connected successfully");
+    
+    // Try to sync database schema
+    console.log("📊 Syncing database schema...");
+    const { execSync } = await import('child_process');
+    execSync('npx prisma db push', { stdio: 'inherit' });
+    console.log("✅ Database schema synced");
+  } catch (error) {
+    console.error("❌ Database initialization failed:", error);
+    // Don't exit - let the server start anyway
+  }
+}
+
 app.use(cors());
 app.use(express.json());
 
@@ -324,35 +342,46 @@ app.delete("/savings-goals/:id", authenticateToken, async (req, res) => {
 
 const PORT = process.env.PORT || 4000;
 
-console.log(`Starting server on port ${PORT}...`);
-console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-console.log(
-  `Database URL configured: ${process.env.DATABASE_URL ? "Yes" : "No"}`
-);
+async function startServer() {
+  console.log(`Starting server on port ${PORT}...`);
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(
+    `Database URL configured: ${process.env.DATABASE_URL ? "Yes" : "No"}`
+  );
 
-const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ Backend API server running on port ${PORT}`);
-  console.log(`✅ Server is ready to accept connections`);
-});
+  // Initialize database
+  await initializeDatabase();
 
-server.on("error", (error) => {
-  console.error("❌ Server error:", error);
-  process.exit(1);
-});
-
-process.on("SIGTERM", () => {
-  console.log("SIGTERM received, shutting down gracefully");
-  server.close(() => {
-    console.log("Process terminated");
+  const server = app.listen(PORT, "0.0.0.0", () => {
+    console.log(`✅ Backend API server running on port ${PORT}`);
+    console.log(`✅ Server is ready to accept connections`);
   });
-});
 
-process.on("uncaughtException", (error) => {
-  console.error("❌ Uncaught Exception:", error);
-  process.exit(1);
-});
+  server.on("error", (error) => {
+    console.error("❌ Server error:", error);
+    process.exit(1);
+  });
 
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+  process.on("SIGTERM", () => {
+    console.log("SIGTERM received, shutting down gracefully");
+    server.close(() => {
+      console.log("Process terminated");
+    });
+  });
+
+  process.on("uncaughtException", (error) => {
+    console.error("❌ Uncaught Exception:", error);
+    process.exit(1);
+  });
+
+  process.on("unhandledRejection", (reason, promise) => {
+    console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+    process.exit(1);
+  });
+}
+
+// Start the server
+startServer().catch((error) => {
+  console.error("❌ Failed to start server:", error);
   process.exit(1);
 });
