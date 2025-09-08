@@ -63,7 +63,9 @@ app.post("/signup", async (req, res) => {
     // Ensure DB connection
     await prisma.$connect();
 
-    const existing = await prisma.user.findUnique({ where: { email: emailLower } });
+    const existing = await prisma.user.findUnique({
+      where: { email: emailLower },
+    });
     if (existing) {
       console.log("[POST /signup] email already registered:", emailLower);
       return res.status(409).json({ error: "Email already registered" });
@@ -81,7 +83,10 @@ app.post("/signup", async (req, res) => {
     );
 
     console.log("[POST /signup] success for:", emailLower);
-    return res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+    return res.json({
+      token,
+      user: { id: user.id, name: user.name, email: user.email },
+    });
   } catch (error) {
     console.error("[POST /signup] error:", error);
     const message = error?.message || "Signup failed";
@@ -92,18 +97,23 @@ app.post("/signup", async (req, res) => {
 // Debug endpoint to check DB connectivity and table state
 app.get("/debug/db", async (_req, res) => {
   try {
-    const result = { connected: false, tables: {}, env: { hasDbUrl: Boolean(process.env.DATABASE_URL) } };
+    const result = {
+      connected: false,
+      tables: {},
+      env: { hasDbUrl: Boolean(process.env.DATABASE_URL) },
+    };
     await prisma.$connect();
     result.connected = true;
-    const [users, accounts, incomes, expenses, friends, budgets, savings] = await Promise.all([
-      prisma.user.count().catch(() => -1),
-      prisma.account.count().catch(() => -1),
-      prisma.income.count().catch(() => -1),
-      prisma.expense.count().catch(() => -1),
-      prisma.friendTransaction.count().catch(() => -1),
-      prisma.budgetGoal.count().catch(() => -1),
-      prisma.savingsGoal.count().catch(() => -1),
-    ]);
+    const [users, accounts, incomes, expenses, friends, budgets, savings] =
+      await Promise.all([
+        prisma.user.count().catch(() => -1),
+        prisma.account.count().catch(() => -1),
+        prisma.income.count().catch(() => -1),
+        prisma.expense.count().catch(() => -1),
+        prisma.friendTransaction.count().catch(() => -1),
+        prisma.budgetGoal.count().catch(() => -1),
+        prisma.savingsGoal.count().catch(() => -1),
+      ]);
     result.tables = {
       User: users,
       Account: accounts,
@@ -116,7 +126,9 @@ app.get("/debug/db", async (_req, res) => {
     res.json(result);
   } catch (error) {
     console.error("[/debug/db] error:", error);
-    res.status(500).json({ connected: false, error: error?.message || String(error) });
+    res
+      .status(500)
+      .json({ connected: false, error: error?.message || String(error) });
   }
 });
 
