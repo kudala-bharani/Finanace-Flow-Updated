@@ -20,10 +20,11 @@ services:
 
   - type: web
     name: finance-flow-frontend
-    env: static
+    env: node
+    plan: free
     rootDir: .
     buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
+    startCommand: node serve.js
     envVars:
       - key: VITE_API_URL
         value: https://finance-flow-backend-nq56.onrender.com
