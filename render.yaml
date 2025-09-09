@@ -26,4 +26,4 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        value: https://finance-flow-backend.onrender.com
+        value: https://finance-flow-backend-nq56.onrender.com
