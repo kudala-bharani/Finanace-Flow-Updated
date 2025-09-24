@@ -18,13 +18,12 @@ services:
       - key: DATABASE_URL
         sync: false
 
-  - type: web
+  - type: static
     name: finance-flow-frontend
-    env: node
     plan: free
     rootDir: .
     buildCommand: npm ci && npm run build
-    startCommand: node serve.js
+    staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
         value: https://finance-flow-backend-nq56.onrender.com
