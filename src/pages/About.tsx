@@ -70,7 +70,7 @@ export default function AboutPage() {
                   size="lg"
                   className="relative overflow-hidden bg-background text-white font-semibold px-8 py-4 rounded-xl shadow-lg border-2 border-white/80 flex items-center gap-2 focus:ring-2 focus:ring-emerald-300 focus:outline-none transition-colors duration-300 group"
                   onClick={() =>
-                    window.open("https://your-portfolio-link.com", "_blank")
+                    window.open("https://bharani-kudala.me/", "_blank")
                   }
                 >
                   <span
