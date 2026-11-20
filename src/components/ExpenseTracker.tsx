@@ -9,7 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { useFinanceData, Expense } from "@/hooks/useFinanceData";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -249,6 +249,10 @@ export const ExpenseTracker = () => {
 
   // Update pie data calls to not pass categories
   const totalPieData = getPieData(expenses);
+  const getCategoryColor = (category: string) => {
+    const index = Math.max(0, categories.indexOf(category));
+    return CATEGORY_COLORS[index % CATEGORY_COLORS.length];
+  };
   const monthPieData = getPieData(
     expenses.filter((expense) => {
       const date = new Date(expense.date);
@@ -265,14 +269,14 @@ export const ExpenseTracker = () => {
       <PageHeader
         title="Expenses"
         subtitle="Track your spending and expenses"
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Expenses" }]}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
           <button
+            type="button"
             onClick={() => setIsFormOpen(true)}
             className="flex items-center space-x-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
           >
-            <Plus size={20} />
+            <Plus size={20} aria-hidden="true" />
             <span>Add Expense</span>
           </button>
           <Dialog open={isCategoriesOpen} onOpenChange={setIsCategoriesOpen}>
@@ -281,15 +285,15 @@ export const ExpenseTracker = () => {
                 <span>Manage Categories</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-xl p-0 overflow-hidden">
+            <DialogContent className="max-h-[calc(100dvh-1.5rem)] w-11/12 max-w-xl overflow-y-auto rounded-lg p-0" aria-describedby={undefined}>
               <div className="w-full bg-card rounded-lg">
-                <div className="flex items-center gap-2 px-6 pt-6 pb-2 border-b border-border">
+                <div className="flex items-center gap-2 px-4 pb-2 pt-6 pr-12 border-b border-border sm:px-6 sm:pr-12">
                   <TrendingDown className="w-5 h-5 text-red-400" />
-                  <h2 className="text-lg font-bold text-card-foreground">
+                  <DialogTitle className="text-lg font-bold leading-normal text-card-foreground">
                     Manage Categories
-                  </h2>
+                  </DialogTitle>
                 </div>
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -306,8 +310,9 @@ export const ExpenseTracker = () => {
                     <input
                       value={newCategory}
                       onChange={(e) => setNewCategory(e.target.value)}
+                      aria-label="Add new category"
                       placeholder="Add new category"
-                      className="flex-1 px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-red-400 outline-none transition shadow-sm"
+                      className="min-w-0 flex-1 px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-red-400 outline-none transition shadow-sm"
                     />
                     <button
                       type="submit"
@@ -320,7 +325,7 @@ export const ExpenseTracker = () => {
                     {categories.map((cat, idx) => (
                       <li
                         key={cat}
-                        className="flex items-center bg-muted rounded-full px-4 py-2 shadow-sm group border border-border cursor-grab"
+                        className="flex items-center min-w-0 bg-muted rounded-full px-3 py-2 shadow-sm group sm:px-4 border border-border cursor-grab"
                         draggable
                         onDragStart={() => handleDragStart(idx)}
                         onDragEnter={() => handleDragEnter(idx)}
@@ -329,11 +334,12 @@ export const ExpenseTracker = () => {
                       >
                         <GripVertical className="w-4 h-4 mr-2 text-muted-foreground opacity-60 cursor-grab" />
                         {editingIndex === idx ? (
-                          <div className="flex items-center gap-2 flex-1">
+                          <div className="flex min-w-0 flex-1 items-center gap-2">
                             <input
+                              aria-label="Edit category name"
                               value={editingValue}
                               onChange={(e) => setEditingValue(e.target.value)}
-                              className="px-2 py-1 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-red-400 outline-none text-sm flex-1"
+                              className="px-2 py-1 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-red-400 outline-none text-sm w-0 min-w-0 flex-1"
                               autoFocus
                             />
                             <button
@@ -361,7 +367,7 @@ export const ExpenseTracker = () => {
                           </div>
                         ) : (
                           <>
-                            <span className="font-medium text-card-foreground text-sm mr-2 flex-1">
+                            <span className="font-medium min-w-0 text-card-foreground text-sm mr-2 flex-1 [overflow-wrap:anywhere]">
                               {cat}
                             </span>
                             <TooltipProvider>
@@ -411,32 +417,34 @@ export const ExpenseTracker = () => {
           </div>
         }
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 mt-4">
+      <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 lg:gap-6 mt-4">
         <SummaryCard
           icon={<TrendingDown className="w-7 h-7" />}
           title="This Month"
           value={<Money amount={currentMonthExpenses} />}
           color="orange"
+          className="min-w-0 gap-3 p-4 tabular-nums sm:gap-4 sm:p-6 [&>div:last-child]:min-w-0 [&>div:last-child]:break-words"
         />
         <SummaryCard
           icon={<TrendingDown className="w-7 h-7" />}
           title="Total Expenses"
           value={<Money amount={totalExpenses} />}
           color="red"
+          className="min-w-0 gap-3 p-4 tabular-nums sm:gap-4 sm:p-6 [&>div:last-child]:min-w-0 [&>div:last-child]:break-words"
         />
       </div>
 
       {/* Pie Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-card rounded-lg border border-border p-6 flex flex-col items-center">
-          <h3 className="font-semibold text-card-foreground mb-4">
+      <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2 lg:gap-6 lg:mb-8">
+        <div className="flex min-w-0 flex-col items-center rounded-lg border border-border bg-card p-4 sm:p-6">
+          <h3 className="mb-4 text-center font-semibold text-card-foreground">
             This Month by Category
           </h3>
-          <div className="w-full">
+          <div className="w-full min-w-0 max-sm:[&_.apexcharts-datalabel-value]:!text-sm">
             <PieChartApex
               series={monthPieData.map((d) => d.value)}
               labels={monthPieData.map((d) => d.name)}
-              colors={CATEGORY_COLORS}
+              colors={monthPieData.map(({ name }) => getCategoryColor(name))}
               height={270}
               totalLabel="This Month"
               totalFormatter={(sum) =>
@@ -448,15 +456,15 @@ export const ExpenseTracker = () => {
             />
           </div>
         </div>
-        <div className="bg-card rounded-lg border border-border p-6 flex flex-col items-center">
-          <h3 className="font-semibold text-card-foreground mb-4">
+        <div className="flex min-w-0 flex-col items-center rounded-lg border border-border bg-card p-4 sm:p-6">
+          <h3 className="mb-4 text-center font-semibold text-card-foreground">
             Total Expenses by Category
           </h3>
-          <div className="w-full">
+          <div className="w-full min-w-0 max-sm:[&_.apexcharts-datalabel-value]:!text-sm">
             <PieChartApex
               series={totalPieData.map((d) => d.value)}
               labels={totalPieData.map((d) => d.name)}
-              colors={CATEGORY_COLORS}
+              colors={totalPieData.map(({ name }) => getCategoryColor(name))}
               height={270}
               totalLabel="Total Expenses"
               totalFormatter={(sum) =>
@@ -472,12 +480,12 @@ export const ExpenseTracker = () => {
 
       {/* Expenses List */}
       <div className="bg-card rounded-lg border border-border">
-        <div className="p-6 border-b border-border">
+        <div className="border-b border-border px-4 py-4 sm:px-6">
           <h2 className="text-xl font-semibold text-card-foreground">
             Recent Expenses
           </h2>
         </div>
-        <div className="divide-y divide-border max-h-[400px] overflow-y-auto">
+        <div className="max-h-[400px] space-y-2 overflow-y-auto p-2">
           {expenses.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground flex flex-col items-center">
               <TrendingDown className="w-16 h-16 mb-4 opacity-40" />
@@ -487,7 +495,7 @@ export const ExpenseTracker = () => {
               </p>
             </div>
           ) : (
-            expenses
+            [...expenses]
               .sort((a, b) => {
                 const dateDiff =
                   new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -496,27 +504,22 @@ export const ExpenseTracker = () => {
                 return (Number(b.id) || 0) - (Number(a.id) || 0);
               })
               .map((expense) => {
-                const colorIdx = categories.findIndex(
-                  (cat) => cat === expense.category
-                );
-                const dotColor =
-                  CATEGORY_COLORS[colorIdx % CATEGORY_COLORS.length] ||
-                  CATEGORY_COLORS[0];
+                const dotColor = getCategoryColor(expense.category);
                 return (
                   <div
                     key={expense.id}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-2 p-4 rounded-xl bg-muted/60 hover:bg-muted transition shadow-sm m-2"
+                    className="flex flex-col justify-between gap-2 rounded-xl bg-muted/60 p-3 shadow-sm transition-colors hover:bg-muted md:flex-row md:items-center sm:p-4"
                   >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 md:flex-nowrap md:gap-3">
                       <span
                         className="inline-block w-3 h-3 rounded-full flex-shrink-0"
                         style={{ backgroundColor: dotColor }}
                       />
-                      <span className="font-semibold text-card-foreground text-base truncate">
+                      <span className="min-w-0 flex-1 text-base font-semibold text-card-foreground [overflow-wrap:anywhere]">
                         {expense.description}
                       </span>
                       <span
-                        className="px-2 py-1 text-xs rounded-full ml-2"
+                        className="max-w-full rounded-full px-2 py-1 text-xs [overflow-wrap:anywhere] md:max-w-[10rem]"
                         style={{
                           backgroundColor: dotColor + "22",
                           color: dotColor,
@@ -524,12 +527,12 @@ export const ExpenseTracker = () => {
                       >
                         {expense.category}
                       </span>
-                      <span className="text-xs text-muted-foreground ml-2 hidden md:inline">
+                      <span className="hidden w-24 shrink-0 text-right text-xs text-muted-foreground md:inline">
                         {new Date(expense.date).toLocaleDateString()}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 md:gap-6">
-                      <span className="text-xl font-bold text-red-400 md:text-2xl">
+                    <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 md:w-[min(17rem,42%)] md:shrink-0 md:justify-end md:gap-4">
+                      <span className="text-xl font-bold tabular-nums text-red-400 [overflow-wrap:anywhere] md:text-2xl">
                         -<Money amount={expense.amount} />
                       </span>
                       <div className="flex gap-1">
@@ -539,7 +542,7 @@ export const ExpenseTracker = () => {
                               <button
                                 onClick={() => handleEdit(expense)}
                                 className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 text-muted-foreground hover:text-primary transition"
-                                aria-label="Edit"
+                                aria-label={"Edit " + expense.description}
                               >
                                 <Edit2 size={18} />
                               </button>
@@ -551,7 +554,7 @@ export const ExpenseTracker = () => {
                               <button
                                 onClick={() => handleDelete(expense.id)}
                                 className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 text-muted-foreground hover:text-red-500 transition"
-                                aria-label="Delete"
+                                aria-label={"Delete " + expense.description}
                               >
                                 <Trash2 size={18} />
                               </button>
@@ -573,8 +576,8 @@ export const ExpenseTracker = () => {
 
       {/* Form Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md border border-border shadow-xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3">
+          <div className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-card p-4 shadow-xl sm:p-6">
             <button
               className="absolute top-3 right-3 text-muted-foreground hover:text-foreground p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-red-400"
               onClick={resetForm}
@@ -583,11 +586,12 @@ export const ExpenseTracker = () => {
               <X size={28} />
             </button>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-2">
+              <h3 className="mb-2 pr-10 text-lg font-semibold">
                 {editingExpense ? "Edit Expense" : "Add Expense"}
               </h3>
               <input
                 type="text"
+                aria-label="What did you spend on?"
                 placeholder="What did you spend on?"
                 value={formData.description}
                 onChange={(e) =>
@@ -603,7 +607,7 @@ export const ExpenseTracker = () => {
                 }
                 required
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full" aria-label="Select category">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -616,7 +620,9 @@ export const ExpenseTracker = () => {
               </Select>
               <input
                 type="number"
+                inputMode="decimal"
                 step="0.01"
+                aria-label="Amount"
                 placeholder="Amount"
                 value={formData.amount === 0 ? "" : formData.amount}
                 onFocus={(e) => {
@@ -668,7 +674,7 @@ export const ExpenseTracker = () => {
           if (!open && !deleteLoading) setDeleteId(null);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="w-11/12 rounded-lg p-4 sm:p-6">
           <AlertDialogTitle>Delete Expense</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this expense? This action cannot be

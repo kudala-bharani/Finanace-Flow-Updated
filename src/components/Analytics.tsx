@@ -124,15 +124,14 @@ export const Analytics = () => {
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <PageHeader
         title="Analytics"
         subtitle="Visual insights into your financial data"
-        breadcrumbs={[{ label: 'Home', href: '/dashboard' }, { label: 'Analytics' }]}
       />
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
         <SummaryCard
           icon={<TrendingUp className="w-7 h-7" />}
           title="Total Income"
@@ -154,7 +153,7 @@ export const Analytics = () => {
       </div>
 
       {/* Monthly Trends Chart */}
-      <div className="bg-card rounded-lg p-6 border border-border">
+      <div className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-6">
         <h2 className="text-xl font-semibold text-card-foreground mb-6">Monthly Trends</h2>
         {monthlyData.length === 0 ? (
           <div className="h-64 flex items-center justify-center text-muted-foreground">
@@ -168,6 +167,7 @@ export const Analytics = () => {
                 dataKey="month" 
                 stroke="#9ca3af"
                 fontSize={12}
+                minTickGap={12}
               />
               <YAxis 
                 stroke="#9ca3af"
@@ -178,7 +178,7 @@ export const Analytics = () => {
                     : value
                 }
               />
-              <Tooltip content={<CustomBarTooltip />} cursor={{ fill: 'rgba(16,185,129,0.08)' }} />
+              <Tooltip content={CustomBarTooltip} cursor={{ fill: 'rgba(16,185,129,0.08)' }} />
               <Bar dataKey="income" fill="#10b981" name="Income" radius={[6, 6, 0, 0]} />
               <Bar dataKey="expenses" fill="#ef4444" name="Expenses" radius={[6, 6, 0, 0]} />
             </BarChart>
@@ -189,10 +189,10 @@ export const Analytics = () => {
       {/* Pie Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Income Sources */}
-        <div className="bg-card rounded-lg p-6 border border-border flex flex-col items-center">
+        <div className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-6 flex flex-col items-center">
           <h2 className="text-xl font-semibold text-card-foreground mb-6 text-center w-full">Income Sources</h2>
           {incomeSourcesData.length > 0 ? (
-            <div className="w-full">
+            <div className="w-full min-w-0">
               <PieChartApex
                 series={incomeSourcesData.map(d => d.value)}
                 labels={incomeSourcesData.map(d => d.name)}
@@ -209,10 +209,10 @@ export const Analytics = () => {
           )}
         </div>
         {/* Expense Categories */}
-        <div className="bg-card rounded-lg p-6 border border-border flex flex-col items-center">
+        <div className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-6 flex flex-col items-center">
           <h2 className="text-xl font-semibold text-card-foreground mb-6 text-center w-full">Expense Categories</h2>
           {expenseCategoriesData.length > 0 ? (
-            <div className="w-full">
+            <div className="w-full min-w-0">
               <PieChartApex
                 series={expenseCategoriesData.map(d => d.value)}
                 labels={expenseCategoriesData.map(d => d.name)}

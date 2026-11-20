@@ -9,7 +9,7 @@ import {
   GripVertical,
 } from "lucide-react";
 import { useFinanceData, FriendTransaction } from "@/hooks/useFinanceData";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -197,14 +197,14 @@ export const FriendTransactions = () => {
       <PageHeader
         title="Friend Transactions"
         subtitle="Track money to receive and to give"
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Friends" }]}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
           <button
+            type="button"
             onClick={() => setIsFormOpen(true)}
             className="flex items-center space-x-2 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors"
           >
-            <Plus size={20} />
+            <Plus size={20} aria-hidden="true" />
             <span>Add Transaction</span>
           </button>
           <Dialog open={isFriendsOpen} onOpenChange={setIsFriendsOpen}>
@@ -217,15 +217,15 @@ export const FriendTransactions = () => {
                 <span>Manage Friends</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-xl p-0 overflow-hidden">
+            <DialogContent className="max-h-[calc(100dvh-1.5rem)] w-11/12 max-w-xl overflow-y-auto rounded-lg p-0" aria-describedby={undefined}>
               <div className="w-full bg-card rounded-lg">
-                <div className="flex items-center gap-2 px-6 pt-6 pb-2 border-b border-border">
+                <div className="flex items-center gap-2 px-4 pb-2 pt-6 pr-12 border-b border-border sm:px-6 sm:pr-12">
                   <Users className="w-5 h-5 text-purple-400" />
-                  <h2 className="text-lg font-bold text-card-foreground">
+                  <DialogTitle className="text-lg font-bold leading-normal text-card-foreground">
                     Manage Friends
-                  </h2>
+                  </DialogTitle>
                 </div>
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -242,8 +242,9 @@ export const FriendTransactions = () => {
                     <input
                       value={newFriend}
                       onChange={(e) => setNewFriend(e.target.value)}
+                      aria-label="Add new friend"
                       placeholder="Add new friend"
-                      className="flex-1 px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-purple-400 outline-none transition shadow-sm"
+                      className="min-w-0 flex-1 px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-purple-400 outline-none transition shadow-sm"
                     />
                     <button
                       type="submit"
@@ -256,7 +257,7 @@ export const FriendTransactions = () => {
                     {friendNames.map((name, idx) => (
                       <li
                         key={name}
-                        className="flex items-center bg-muted rounded-full px-4 py-2 shadow-sm group border border-border cursor-grab"
+                        className="flex items-center min-w-0 bg-muted rounded-full px-3 py-2 shadow-sm group sm:px-4 border border-border cursor-grab"
                         draggable
                         onDragStart={() => handleFriendDragStart(idx)}
                         onDragEnter={() => handleFriendDragEnter(idx)}
@@ -265,13 +266,14 @@ export const FriendTransactions = () => {
                       >
                         <GripVertical className="w-4 h-4 mr-2 text-muted-foreground opacity-60 cursor-grab" />
                         {editingFriendIndex === idx ? (
-                          <div className="flex items-center gap-2 flex-1">
+                          <div className="flex min-w-0 flex-1 items-center gap-2">
                             <input
+                              aria-label="Edit friend name"
                               value={editingFriendValue}
                               onChange={(e) =>
                                 setEditingFriendValue(e.target.value)
                               }
-                              className="px-2 py-1 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-purple-400 outline-none text-sm flex-1"
+                              className="px-2 py-1 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-purple-400 outline-none text-sm w-0 min-w-0 flex-1"
                               autoFocus
                             />
                             <button
@@ -299,7 +301,7 @@ export const FriendTransactions = () => {
                           </div>
                         ) : (
                           <>
-                            <span className="font-medium text-card-foreground text-sm mr-2 flex-1">
+                            <span className="font-medium min-w-0 text-card-foreground text-sm mr-2 flex-1 [overflow-wrap:anywhere]">
                               {name}
                             </span>
                             <TooltipProvider>
@@ -349,28 +351,30 @@ export const FriendTransactions = () => {
           </div>
         }
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+      <div className="grid grid-cols-1 gap-4 mb-4 mt-4 md:grid-cols-2 lg:gap-6">
         <SummaryCard
           icon={<Users className="w-7 h-7" />}
           title="Money to Receive"
           value={<Money amount={totalToReceive} />}
           color="emerald"
+          className="min-w-0 gap-3 p-4 tabular-nums sm:gap-4 sm:p-6 [&>div:last-child]:min-w-0 [&>div:last-child]:break-words"
         />
         <SummaryCard
           icon={<Users className="w-7 h-7" />}
           title="Money to Give"
           value={<Money amount={totalToGive} />}
           color="red"
+          className="min-w-0 gap-3 p-4 tabular-nums sm:gap-4 sm:p-6 [&>div:last-child]:min-w-0 [&>div:last-child]:break-words"
         />
       </div>
 
       {/* Pie charts below summary cards, above transactions table */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 mt-4">
-        <div className="bg-card rounded-lg border border-border p-6 flex flex-col items-center">
-          <h3 className="font-semibold text-card-foreground mb-4">
+      <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2 lg:gap-6 lg:mb-8">
+        <div className="flex min-w-0 flex-col items-center rounded-lg border border-border bg-card p-4 sm:p-6">
+          <h3 className="mb-4 text-center font-semibold text-card-foreground">
             Total Given to Friends
           </h3>
-          <div className="w-full">
+          <div className="w-full min-w-0 max-sm:[&_.apexcharts-datalabel-value]:!text-sm">
             <PieChartApex
               series={totalReceivedPie.map((d) => d.value)}
               labels={totalReceivedPie.map((d) => d.name)}
@@ -386,11 +390,11 @@ export const FriendTransactions = () => {
             />
           </div>
         </div>
-        <div className="bg-card rounded-lg border border-border p-6 flex flex-col items-center">
-          <h3 className="font-semibold text-card-foreground mb-4">
+        <div className="flex min-w-0 flex-col items-center rounded-lg border border-border bg-card p-4 sm:p-6">
+          <h3 className="mb-4 text-center font-semibold text-card-foreground">
             Total Taken from Friends
           </h3>
-          <div className="w-full">
+          <div className="w-full min-w-0 max-sm:[&_.apexcharts-datalabel-value]:!text-sm">
             <PieChartApex
               series={totalGivenPie.map((d) => d.value)}
               labels={totalGivenPie.map((d) => d.name)}
@@ -413,7 +417,8 @@ export const FriendTransactions = () => {
         <div className="flex border-b border-border">
           <button
             onClick={() => setActiveTab("receive")}
-            className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+            aria-pressed={activeTab === "receive"}
+            className={`min-w-0 flex-1 px-2 py-3 text-sm font-medium transition-colors sm:px-6 sm:py-4 ${
               activeTab === "receive"
                 ? "text-emerald-400 border-b-2 border-emerald-400 bg-emerald-500/5"
                 : "text-muted-foreground hover:text-card-foreground"
@@ -423,7 +428,8 @@ export const FriendTransactions = () => {
           </button>
           <button
             onClick={() => setActiveTab("give")}
-            className={`flex-1 px-6 py-4 text-sm font-medium transition-colors ${
+            aria-pressed={activeTab === "give"}
+            className={`min-w-0 flex-1 px-2 py-3 text-sm font-medium transition-colors sm:px-6 sm:py-4 ${
               activeTab === "give"
                 ? "text-red-400 border-b-2 border-red-400 bg-red-500/5"
                 : "text-muted-foreground hover:text-card-foreground"
@@ -447,8 +453,8 @@ export const FriendTransactions = () => {
                     key={transaction.id}
                     className="p-4 hover:bg-muted/70 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
+                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                      <div className="min-w-0 flex-[1_1_7rem] [overflow-wrap:anywhere]">
                         <h3 className="font-semibold text-card-foreground">
                           {transaction.name}
                         </h3>
@@ -459,14 +465,15 @@ export const FriendTransactions = () => {
                           {new Date(transaction.date).toLocaleDateString()}
                         </p>
                       </div>
-                      <div className="flex items-center space-x-4">
-                        <div className="font-bold text-lg text-emerald-500">
+                      <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-2">
+                        <div className="text-right text-lg font-bold tabular-nums text-emerald-500 [overflow-wrap:anywhere]">
                           +<Money amount={transaction.amount} />
                         </div>
                         <div className="flex space-x-2">
                           <button
                             onClick={() => markAsCompleted(transaction.id)}
                             className="p-2 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-500 transition"
+                            aria-label={"Mark transaction with " + transaction.name + " as completed"}
                             title="Mark as completed"
                           >
                             <svg
@@ -486,6 +493,7 @@ export const FriendTransactions = () => {
                           <button
                             onClick={() => deleteTransaction(transaction.id)}
                             className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 text-red-500 transition"
+                            aria-label={"Delete transaction with " + transaction.name}
                             title="Delete"
                           >
                             <Trash2 size={16} />
@@ -512,8 +520,8 @@ export const FriendTransactions = () => {
                     key={transaction.id}
                     className="p-4 hover:bg-muted/70 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
+                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                      <div className="min-w-0 flex-[1_1_7rem] [overflow-wrap:anywhere]">
                         <h3 className="font-semibold text-card-foreground">
                           {transaction.name}
                         </h3>
@@ -524,14 +532,15 @@ export const FriendTransactions = () => {
                           {new Date(transaction.date).toLocaleDateString()}
                         </p>
                       </div>
-                      <div className="flex items-center space-x-4">
-                        <div className="font-bold text-lg text-red-500">
+                      <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-2">
+                        <div className="text-right text-lg font-bold tabular-nums text-red-500 [overflow-wrap:anywhere]">
                           -<Money amount={transaction.amount} />
                         </div>
                         <div className="flex space-x-2">
                           <button
                             onClick={() => markAsCompleted(transaction.id)}
                             className="p-2 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-500 transition"
+                            aria-label={"Mark transaction with " + transaction.name + " as completed"}
                             title="Mark as completed"
                           >
                             <svg
@@ -551,6 +560,7 @@ export const FriendTransactions = () => {
                           <button
                             onClick={() => deleteTransaction(transaction.id)}
                             className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 text-red-500 transition"
+                            aria-label={"Delete transaction with " + transaction.name}
                             title="Delete"
                           >
                             <Trash2 size={16} />
@@ -568,8 +578,8 @@ export const FriendTransactions = () => {
 
       {/* Form Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md border border-border shadow-xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3">
+          <div className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-card p-4 shadow-xl sm:p-6">
             <button
               className="absolute top-3 right-3 text-muted-foreground hover:text-foreground p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400"
               onClick={resetForm}
@@ -578,7 +588,7 @@ export const FriendTransactions = () => {
               <X size={28} />
             </button>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-2">Add Transaction</h3>
+              <h3 className="mb-2 pr-10 text-lg font-semibold">Add Transaction</h3>
               <div className="flex items-center gap-2">
                 <Select
                   value={formData.name}
@@ -587,7 +597,7 @@ export const FriendTransactions = () => {
                   }
                   required
                 >
-                  <SelectTrigger className="flex-1">
+                  <SelectTrigger className="flex-1" aria-label="Select friend">
                     <SelectValue placeholder="Select friend" />
                   </SelectTrigger>
                   <SelectContent>
@@ -601,7 +611,9 @@ export const FriendTransactions = () => {
               </div>
               <input
                 type="number"
+                inputMode="decimal"
                 step="0.01"
+                aria-label="Amount"
                 placeholder="Amount"
                 value={formData.amount === 0 ? "" : formData.amount}
                 onFocus={(e) => {
@@ -627,6 +639,7 @@ export const FriendTransactions = () => {
               />
               <input
                 type="text"
+                aria-label="Reason"
                 placeholder="Reason"
                 value={formData.description}
                 onChange={(e) =>
@@ -645,7 +658,7 @@ export const FriendTransactions = () => {
                 }
                 required
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full" aria-label="Select type">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>

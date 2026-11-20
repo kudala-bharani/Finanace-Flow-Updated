@@ -11,13 +11,7 @@ import {
 } from "lucide-react";
 import { useFinanceData } from "@/hooks/useFinanceData";
 import { RecentActivity } from "@/components/RecentActivity";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useRef } from "react";
 import {
   Select,
@@ -26,7 +20,6 @@ import {
   SelectContent,
   SelectItem,
 } from "./ui/select";
-import { DatePicker } from "./ui/datepicker";
 import { Money } from "./Money";
 import { PageHeader } from "./PageHeader";
 
@@ -38,9 +31,11 @@ function WelcomeMessage() {
       const parsed = JSON.parse(user);
       if (parsed.name) name = parsed.name;
     }
-  } catch {}
+  } catch {
+    // Use the generic greeting if the stored profile cannot be read.
+  }
   return (
-    <div className="text-lg text-muted-foreground mb-4">
+    <div className="text-lg text-muted-foreground break-words">
       Welcome to FinanceFlow,{" "}
       <span className="font-semibold">{name || "there"}</span>!
     </div>
@@ -57,10 +52,6 @@ export const Dashboard = () => {
     addExpense,
     addFriendTransaction,
   } = useFinanceData();
-  const [quickAction, setQuickAction] = useState<
-    null | "income" | "expense" | "accounts" | "budget"
-  >(null);
-
   // Income source options (sync with localStorage)
   const [incomeSources, setIncomeSources] = useState<string[]>(() => {
     const stored = localStorage.getItem("incomeSources");
@@ -288,17 +279,13 @@ export const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (incomeForm.source !== (incomeSources[0] || "Other")) {
-      setIncomeForm((f) => ({ ...f, source: incomeSources[0] || "Other" }));
-    }
+    const source = incomeSources[0] || "Other";
+    setIncomeForm((form) => form.source === source ? form : { ...form, source });
   }, [incomeSources]);
+
   useEffect(() => {
-    if (expenseForm.category !== (expenseCategories[0] || "Other")) {
-      setExpenseForm((f) => ({
-        ...f,
-        category: expenseCategories[0] || "Other",
-      }));
-    }
+    const category = expenseCategories[0] || "Other";
+    setExpenseForm((form) => form.category === category ? form : { ...form, category });
   }, [expenseCategories]);
 
   const [incomeForm, setIncomeForm] = useState({
@@ -364,11 +351,8 @@ export const Dashboard = () => {
       <PageHeader
         title="Dashboard"
         subtitle="Overview and quick actions"
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Dashboard" }]}
       />
-      <div className="mt-2">
-        <WelcomeMessage />
-      </div>
+      <WelcomeMessage />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
@@ -377,16 +361,16 @@ export const Dashboard = () => {
           return (
             <div
               key={index}
-              className="rounded-xl border p-3 lg:p-4 flex flex-col justify-between bg-muted min-h-[80px] lg:min-h-[100px]"
+              className="min-w-0 rounded-xl border p-3 lg:p-4 flex flex-col justify-between bg-muted min-h-[80px] lg:min-h-[100px]"
             >
               <div className="flex items-center gap-2">
-                <Icon className={`w-4 h-4 lg:w-4 lg:h-4 ${stat.color}`} />
+                <Icon className={`size-4 shrink-0 ${stat.color}`} />
                 <span className="font-semibold text-xs lg:text-sm">
                   {stat.title}
                 </span>
               </div>
               <div
-                className={`text-base lg:text-lg font-bold ${stat.color} mt-2`}
+                className={`text-base lg:text-lg font-bold tabular-nums [overflow-wrap:anywhere] ${stat.color} mt-2`}
               >
                 {stat.value}
               </div>
@@ -400,13 +384,13 @@ export const Dashboard = () => {
         <h2 className="text-lg lg:text-xl font-semibold text-card-foreground mb-4">
           Quick Actions
         </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,15rem),1fr))] gap-3 lg:gap-4">
           {/* Add Income Form */}
           <form
             onSubmit={handleIncomeSubmit}
-            className="bg-card border border-border rounded-lg p-2 lg:p-3 flex flex-col gap-2"
+            className="flex min-w-0 flex-col gap-2 rounded-lg border border-border bg-card p-3"
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="mb-2 flex min-h-8 flex-wrap items-center justify-between gap-x-2 gap-y-1">
               <h3 className="text-emerald-400 font-semibold text-sm lg:text-base">
                 Add Income
               </h3>
@@ -414,23 +398,24 @@ export const Dashboard = () => {
                 <DialogTrigger asChild>
                   <button
                     type="button"
-                    className="text-xs text-emerald-500 hover:underline px-2 py-1 rounded transition"
+                    className="rounded py-1 text-xs text-emerald-500 transition-colors hover:underline"
                   >
                     Manage Sources
                   </button>
                 </DialogTrigger>
-                <DialogContent className="max-w-xl p-0 overflow-hidden">
+                <DialogContent className="max-w-xl p-0" aria-describedby={undefined}>
                   <div className="w-full bg-card rounded-lg">
                     <div className="flex items-center gap-2 px-4 lg:px-6 pt-4 lg:pt-6 pb-2 border-b border-border">
                       <TrendingUp className="w-4 h-4 lg:w-5 lg:h-5 text-emerald-400" />
-                      <h2 className="text-base lg:text-lg font-bold text-card-foreground">
+                      <DialogTitle className="pr-8 text-base font-bold text-card-foreground lg:text-lg">
                         Manage Sources
-                      </h2>
+                      </DialogTitle>
                     </div>
                     <div className="p-4 lg:p-6">
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           if (
                             newSource.trim() &&
                             !incomeSources.includes(newSource.trim())
@@ -455,7 +440,7 @@ export const Dashboard = () => {
                           value={newSource}
                           onChange={(e) => setNewSource(e.target.value)}
                           placeholder="Add new source"
-                          className="flex-1 px-3 lg:px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-emerald-400 outline-none transition shadow-sm text-sm"
+                          className="min-w-0 flex-1 px-3 lg:px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-emerald-400 outline-none transition shadow-sm text-sm"
                         />
                         <button
                           type="submit"
@@ -476,15 +461,15 @@ export const Dashboard = () => {
                             className="flex items-center gap-2 p-2 lg:p-3 bg-muted rounded-lg cursor-move hover:bg-muted/80 transition-colors"
                           >
                             <GripVertical className="w-4 h-4 text-muted-foreground" />
-                            <span className="flex-1 text-sm lg:text-base">
+                            <span className="min-w-0 flex-1 break-words text-sm lg:text-base">
                               {src}
                             </span>
-                            <div className="flex gap-1">
+                            <div className="flex shrink-0 gap-1">
                               <button
                                 type="button"
                                 onClick={() => {
-                                  setEditingIndex(idx);
-                                  setEditingValue(src);
+                                  setEditingSourceIndex(idx);
+                                  setEditingSourceValue(src);
                                 }}
                                 className="p-1 hover:bg-background rounded transition-colors"
                               >
@@ -510,32 +495,32 @@ export const Dashboard = () => {
                           </li>
                         ))}
                       </ul>
-                      {editingIndex !== null && (
+                      {editingSourceIndex !== null && (
                         <div className="mt-4 lg:mt-6 p-3 lg:p-4 bg-muted rounded-lg">
                           <div className="flex gap-2">
                             <input
-                              value={editingValue}
-                              onChange={(e) => setEditingValue(e.target.value)}
-                              className="flex-1 px-3 lg:px-4 py-2 rounded border border-border text-foreground bg-background focus:ring-2 focus:ring-emerald-400 outline-none transition shadow-sm text-sm"
+                              value={editingSourceValue}
+                              onChange={(e) => setEditingSourceValue(e.target.value)}
+                              className="min-w-0 flex-1 px-3 lg:px-4 py-2 rounded border border-border text-foreground bg-background focus:ring-2 focus:ring-emerald-400 outline-none transition shadow-sm text-sm"
                               autoFocus
                             />
                             <button
                               type="button"
                               onClick={() => {
                                 if (
-                                  editingValue.trim() &&
-                                  !incomeSources.includes(editingValue.trim())
+                                  editingSourceValue.trim() &&
+                                  !incomeSources.includes(editingSourceValue.trim())
                                 ) {
                                   const updated = [...incomeSources];
-                                  updated[editingIndex] = editingValue.trim();
+                                  updated[editingSourceIndex] = editingSourceValue.trim();
                                   setIncomeSources(updated);
                                   localStorage.setItem(
                                     "incomeSources",
                                     JSON.stringify(updated)
                                   );
                                 }
-                                setEditingIndex(null);
-                                setEditingValue("");
+                                setEditingSourceIndex(null);
+                                setEditingSourceValue("");
                               }}
                               className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 lg:px-4 py-2 rounded font-semibold transition shadow text-sm"
                             >
@@ -544,8 +529,8 @@ export const Dashboard = () => {
                             <button
                               type="button"
                               onClick={() => {
-                                setEditingIndex(null);
-                                setEditingValue("");
+                                setEditingSourceIndex(null);
+                                setEditingSourceValue("");
                               }}
                               className="bg-muted hover:bg-muted/80 text-foreground px-3 lg:px-4 py-2 rounded font-semibold transition shadow text-sm"
                             >
@@ -561,12 +546,15 @@ export const Dashboard = () => {
             </div>
             <input
               type="number"
+              step="any"
+              inputMode="decimal"
+              aria-label="Amount"
               placeholder="Amount"
               value={incomeForm.amount}
               onChange={(e) =>
                 setIncomeForm({ ...incomeForm, amount: e.target.value })
               }
-              className="px-3 lg:px-4 py-2 rounded border border-emerald-500/30 bg-emerald-500/5 text-foreground focus:ring-2 focus:ring-emerald-400 outline-none transition text-sm"
+              className="h-10 w-full min-w-0 px-3 lg:px-4 rounded border border-emerald-500/30 bg-emerald-500/5 text-foreground focus:ring-2 focus:ring-emerald-400 outline-none transition text-sm"
               required
             />
             <Select
@@ -575,7 +563,7 @@ export const Dashboard = () => {
                 setIncomeForm({ ...incomeForm, source: value })
               }
             >
-              <SelectTrigger className="border-emerald-500/30 bg-emerald-500/5 text-foreground focus:ring-2 focus:ring-emerald-400 text-sm">
+              <SelectTrigger aria-label="Income source" className="border-emerald-500/30 bg-emerald-500/5 text-foreground focus:ring-2 focus:ring-emerald-400 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -588,16 +576,17 @@ export const Dashboard = () => {
             </Select>
             <input
               type="date"
+              aria-label="Date"
               value={incomeForm.date}
               onChange={(e) =>
                 setIncomeForm({ ...incomeForm, date: e.target.value })
               }
-              className="px-3 lg:px-4 py-2 rounded border border-emerald-500/30 bg-emerald-500/5 text-foreground focus:ring-2 focus:ring-emerald-400 outline-none transition text-sm"
+              className="h-10 w-full min-w-0 px-3 lg:px-4 rounded border border-emerald-500/30 bg-emerald-500/5 text-foreground focus:ring-2 focus:ring-emerald-400 outline-none transition text-sm"
               required
             />
             <button
               type="submit"
-              className="bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded font-semibold transition shadow text-sm"
+              className="mt-auto min-h-10 rounded bg-emerald-500 py-2 text-sm font-semibold text-white shadow transition-colors hover:bg-emerald-600"
             >
               Add Income
             </button>
@@ -606,9 +595,9 @@ export const Dashboard = () => {
           {/* Add Expense Form */}
           <form
             onSubmit={handleExpenseSubmit}
-            className="bg-card border border-border rounded-lg p-2 lg:p-3 flex flex-col gap-2"
+            className="flex min-w-0 flex-col gap-2 rounded-lg border border-border bg-card p-3"
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="mb-2 flex min-h-8 flex-wrap items-center justify-between gap-x-2 gap-y-1">
               <h3 className="text-orange-400 font-semibold text-sm lg:text-base">
                 Add Expense
               </h3>
@@ -619,23 +608,24 @@ export const Dashboard = () => {
                 <DialogTrigger asChild>
                   <button
                     type="button"
-                    className="text-xs text-orange-500 hover:underline px-2 py-1 rounded transition"
+                    className="rounded py-1 text-xs text-orange-500 transition-colors hover:underline"
                   >
                     Manage Categories
                   </button>
                 </DialogTrigger>
-                <DialogContent className="max-w-xl p-0 overflow-hidden">
+                <DialogContent className="max-w-xl p-0" aria-describedby={undefined}>
                   <div className="w-full bg-card rounded-lg">
                     <div className="flex items-center gap-2 px-4 lg:px-6 pt-4 lg:pt-6 pb-2 border-b border-border">
                       <TrendingDown className="w-4 h-4 lg:w-5 lg:h-5 text-orange-400" />
-                      <h2 className="text-base lg:text-lg font-bold text-card-foreground">
+                      <DialogTitle className="pr-8 text-base font-bold text-card-foreground lg:text-lg">
                         Manage Categories
-                      </h2>
+                      </DialogTitle>
                     </div>
                     <div className="p-4 lg:p-6">
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           if (
                             newCategory.trim() &&
                             !expenseCategories.includes(newCategory.trim())
@@ -660,7 +650,7 @@ export const Dashboard = () => {
                           value={newCategory}
                           onChange={(e) => setNewCategory(e.target.value)}
                           placeholder="Add new category"
-                          className="flex-1 px-3 lg:px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-orange-400 outline-none transition shadow-sm text-sm"
+                          className="min-w-0 flex-1 px-3 lg:px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-orange-400 outline-none transition shadow-sm text-sm"
                         />
                         <button
                           type="submit"
@@ -681,10 +671,10 @@ export const Dashboard = () => {
                             className="flex items-center gap-2 p-2 lg:p-3 bg-muted rounded-lg cursor-move hover:bg-muted/80 transition-colors"
                           >
                             <GripVertical className="w-4 h-4 text-muted-foreground" />
-                            <span className="flex-1 text-sm lg:text-base">
+                            <span className="min-w-0 flex-1 break-words text-sm lg:text-base">
                               {cat}
                             </span>
-                            <div className="flex gap-1">
+                            <div className="flex shrink-0 gap-1">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -721,7 +711,7 @@ export const Dashboard = () => {
                             <input
                               value={editingValue}
                               onChange={(e) => setEditingValue(e.target.value)}
-                              className="flex-1 px-3 lg:px-4 py-2 rounded border border-border text-foreground bg-background focus:ring-2 focus:ring-orange-400 outline-none transition shadow-sm text-sm"
+                              className="min-w-0 flex-1 px-3 lg:px-4 py-2 rounded border border-border text-foreground bg-background focus:ring-2 focus:ring-orange-400 outline-none transition shadow-sm text-sm"
                               autoFocus
                             />
                             <button
@@ -768,12 +758,15 @@ export const Dashboard = () => {
             </div>
             <input
               type="number"
+              step="any"
+              inputMode="decimal"
+              aria-label="Amount"
               placeholder="Amount"
               value={expenseForm.amount}
               onChange={(e) =>
                 setExpenseForm({ ...expenseForm, amount: e.target.value })
               }
-              className="px-3 lg:px-4 py-2 rounded border border-orange-500/30 bg-orange-500/5 text-foreground focus:ring-2 focus:ring-orange-400 outline-none transition text-sm"
+              className="h-10 w-full min-w-0 px-3 lg:px-4 rounded border border-orange-500/30 bg-orange-500/5 text-foreground focus:ring-2 focus:ring-orange-400 outline-none transition text-sm"
               required
             />
             <Select
@@ -782,7 +775,7 @@ export const Dashboard = () => {
                 setExpenseForm({ ...expenseForm, category: value })
               }
             >
-              <SelectTrigger className="border-orange-500/30 bg-orange-500/5 text-foreground focus:ring-2 focus:ring-orange-400 text-sm">
+              <SelectTrigger aria-label="Expense category" className="border-orange-500/30 bg-orange-500/5 text-foreground focus:ring-2 focus:ring-orange-400 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -796,25 +789,27 @@ export const Dashboard = () => {
             <input
               type="text"
               placeholder="Description"
+              aria-label="Description"
               value={expenseForm.description}
               onChange={(e) =>
                 setExpenseForm({ ...expenseForm, description: e.target.value })
               }
-              className="px-3 lg:px-4 py-2 rounded border border-orange-500/30 bg-orange-500/5 text-foreground focus:ring-2 focus:ring-orange-400 outline-none transition text-sm"
+              className="h-10 w-full min-w-0 px-3 lg:px-4 rounded border border-orange-500/30 bg-orange-500/5 text-foreground focus:ring-2 focus:ring-orange-400 outline-none transition text-sm"
               required
             />
             <input
               type="date"
+              aria-label="Date"
               value={expenseForm.date}
               onChange={(e) =>
                 setExpenseForm({ ...expenseForm, date: e.target.value })
               }
-              className="px-3 lg:px-4 py-2 rounded border border-orange-500/30 bg-orange-500/5 text-foreground focus:ring-2 focus:ring-orange-400 outline-none transition text-sm"
+              className="h-10 w-full min-w-0 px-3 lg:px-4 rounded border border-orange-500/30 bg-orange-500/5 text-foreground focus:ring-2 focus:ring-orange-400 outline-none transition text-sm"
               required
             />
             <button
               type="submit"
-              className="bg-orange-500 hover:bg-orange-600 text-white py-2 rounded font-semibold transition shadow text-sm"
+              className="mt-auto min-h-10 rounded bg-orange-500 py-2 text-sm font-semibold text-white shadow transition-colors hover:bg-orange-600"
             >
               Add Expense
             </button>
@@ -823,9 +818,9 @@ export const Dashboard = () => {
           {/* Add Friend Transaction Form */}
           <form
             onSubmit={handleFriendSubmit}
-            className="bg-card border border-border rounded-lg p-2 lg:p-3 flex flex-col gap-2"
+            className="flex min-w-0 flex-col gap-2 rounded-lg border border-border bg-card p-3"
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="mb-2 flex min-h-8 flex-wrap items-center justify-between gap-x-2 gap-y-1">
               <h3 className="text-purple-400 font-semibold text-sm lg:text-base">
                 Friend Transaction
               </h3>
@@ -833,23 +828,24 @@ export const Dashboard = () => {
                 <DialogTrigger asChild>
                   <button
                     type="button"
-                    className="text-xs text-purple-500 hover:underline px-2 py-1 rounded transition"
+                    className="rounded py-1 text-xs text-purple-500 transition-colors hover:underline"
                   >
                     Manage Friends
                   </button>
                 </DialogTrigger>
-                <DialogContent className="max-w-xl p-0 overflow-hidden">
+                <DialogContent className="max-w-xl p-0" aria-describedby={undefined}>
                   <div className="w-full bg-card rounded-lg">
                     <div className="flex items-center gap-2 px-4 lg:px-6 pt-4 lg:pt-6 pb-2 border-b border-border">
                       <Users className="w-4 h-4 lg:w-5 lg:h-5 text-purple-400" />
-                      <h2 className="text-base lg:text-lg font-bold text-card-foreground">
+                      <DialogTitle className="pr-8 text-base font-bold text-card-foreground lg:text-lg">
                         Manage Friends
-                      </h2>
+                      </DialogTitle>
                     </div>
                     <div className="p-4 lg:p-6">
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           if (
                             newFriend.trim() &&
                             !friendNames.includes(newFriend.trim())
@@ -868,7 +864,7 @@ export const Dashboard = () => {
                           value={newFriend}
                           onChange={(e) => setNewFriend(e.target.value)}
                           placeholder="Add new friend"
-                          className="flex-1 px-3 lg:px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-purple-400 outline-none transition shadow-sm text-sm"
+                          className="min-w-0 flex-1 px-3 lg:px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-purple-400 outline-none transition shadow-sm text-sm"
                         />
                         <button
                           type="submit"
@@ -889,10 +885,10 @@ export const Dashboard = () => {
                             className="flex items-center gap-2 p-2 lg:p-3 bg-muted rounded-lg cursor-move hover:bg-muted/80 transition-colors"
                           >
                             <GripVertical className="w-4 h-4 text-muted-foreground" />
-                            <span className="flex-1 text-sm lg:text-base">
+                            <span className="min-w-0 flex-1 break-words text-sm lg:text-base">
                               {friend}
                             </span>
-                            <div className="flex gap-1">
+                            <div className="flex shrink-0 gap-1">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -931,7 +927,7 @@ export const Dashboard = () => {
                               onChange={(e) =>
                                 setEditingFriendValue(e.target.value)
                               }
-                              className="flex-1 px-3 lg:px-4 py-2 rounded border border-border text-foreground bg-background focus:ring-2 focus:ring-purple-400 outline-none transition shadow-sm text-sm"
+                              className="min-w-0 flex-1 px-3 lg:px-4 py-2 rounded border border-border text-foreground bg-background focus:ring-2 focus:ring-purple-400 outline-none transition shadow-sm text-sm"
                               autoFocus
                             />
                             <button
@@ -983,7 +979,7 @@ export const Dashboard = () => {
                 setFriendForm({ ...friendForm, name: value })
               }
             >
-              <SelectTrigger className="border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 text-sm">
+              <SelectTrigger aria-label="Friend" className="border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 text-sm">
                 <SelectValue placeholder="Select Friend" />
               </SelectTrigger>
               <SelectContent>
@@ -996,22 +992,26 @@ export const Dashboard = () => {
             </Select>
             <input
               type="number"
+              step="any"
+              inputMode="decimal"
+              aria-label="Amount"
               placeholder="Amount"
               value={friendForm.amount}
               onChange={(e) =>
                 setFriendForm({ ...friendForm, amount: e.target.value })
               }
-              className="px-3 lg:px-4 py-2 rounded border border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 outline-none transition text-sm"
+              className="h-10 w-full min-w-0 px-3 lg:px-4 rounded border border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 outline-none transition text-sm"
               required
             />
             <input
               type="text"
               placeholder="Reason"
+              aria-label="Reason"
               value={friendForm.reason}
               onChange={(e) =>
                 setFriendForm({ ...friendForm, reason: e.target.value })
               }
-              className="px-3 lg:px-4 py-2 rounded border border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 outline-none transition text-sm"
+              className="h-10 w-full min-w-0 px-3 lg:px-4 rounded border border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 outline-none transition text-sm"
               required
             />
             <Select
@@ -1023,7 +1023,7 @@ export const Dashboard = () => {
                 })
               }
             >
-              <SelectTrigger className="border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 text-sm">
+              <SelectTrigger aria-label="Transaction type" className="border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 text-sm">
                 <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
@@ -1033,16 +1033,17 @@ export const Dashboard = () => {
             </Select>
             <input
               type="date"
+              aria-label="Date"
               value={friendForm.date}
               onChange={(e) =>
                 setFriendForm({ ...friendForm, date: e.target.value })
               }
-              className="px-3 lg:px-4 py-2 rounded border border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 outline-none transition text-sm"
+              className="h-10 w-full min-w-0 px-3 lg:px-4 rounded border border-purple-500/30 bg-purple-500/5 text-foreground focus:ring-2 focus:ring-purple-400 outline-none transition text-sm"
               required
             />
             <button
               type="submit"
-              className="bg-purple-500 hover:bg-purple-600 text-white py-2 rounded font-semibold transition shadow text-sm"
+              className="mt-auto min-h-10 rounded bg-purple-500 py-2 text-sm font-semibold text-white shadow transition-colors hover:bg-purple-600"
             >
               Add Transaction
             </button>
@@ -1050,13 +1051,7 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent Activity */}
-      <div className="bg-card rounded-lg p-4 lg:p-6 border border-border">
-        <h2 className="text-lg lg:text-xl font-semibold text-card-foreground mb-4">
-          Recent Activity
-        </h2>
-        <RecentActivity />
-      </div>
+      <RecentActivity />
     </div>
   );
 };

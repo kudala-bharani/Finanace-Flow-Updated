@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Filter, X, Calendar, DollarSign } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { DatePicker } from "./ui/datepicker";
@@ -83,45 +83,50 @@ export const SmartSearch = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="mb-4">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="space-y-1">
         <h1 className="text-3xl font-bold text-card-foreground">Smart Search</h1>
-        <p className="text-muted-foreground">Quickly find transactions, accounts, and more</p>
+        <p className="text-muted-foreground">Find income and expenses by name, category, date, or amount</p>
       </div>
       {/* Search Bar */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+        <Search aria-hidden="true" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
         <input
-          type="text"
-          placeholder="Search transactions..."
+          type="search"
+          aria-label="Search transactions"
+          placeholder="Search transactions"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-12 py-3 bg-card border border-border rounded-lg text-card-foreground placeholder-muted-foreground focus:outline-none focus:border-emerald-500"
+          className="w-full pl-10 pr-14 py-3 bg-card border border-border rounded-lg text-card-foreground placeholder-muted-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-500"
         />
         <button
+          type="button"
+          aria-label="Filters"
+          aria-expanded={showFilters}
+          aria-controls={showFilters ? "transaction-filters" : undefined}
           onClick={() => setShowFilters(!showFilters)}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-card-foreground transition-colors"
+          className="absolute right-1 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-md text-muted-foreground transition-colors hover:text-card-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring"
         >
-          <Filter className="w-5 h-5" />
+          <Filter className="size-5" aria-hidden="true" />
         </button>
       </div>
 
       {/* Advanced Filters */}
       {showFilters && (
-        <div className="bg-card rounded-lg p-4 border border-border space-y-4">
-          <div className="flex items-center justify-between">
+        <div id="transaction-filters" className="space-y-4 rounded-lg border border-border bg-card p-4">
+          <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
             <h3 className="text-card-foreground font-medium">Advanced Filters</h3>
             <button onClick={clearFilters} className="text-muted-foreground hover:text-card-foreground text-sm">
               Clear All
             </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
             <Select
               value={filters.type}
               onValueChange={value => setFilters({ ...filters, type: value })}
             >
-              <SelectTrigger className="bg-muted border border-border rounded px-3 py-2 text-card-foreground w-full">
+              <SelectTrigger className="w-full min-w-0 rounded border border-border bg-muted px-3 py-2 text-card-foreground" aria-label="Transaction type">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
               <SelectContent>
@@ -134,7 +139,7 @@ export const SmartSearch = () => {
               value={filters.category}
               onValueChange={value => setFilters({ ...filters, category: value })}
             >
-              <SelectTrigger className="bg-muted border border-border rounded px-3 py-2 text-card-foreground w-full">
+              <SelectTrigger className="w-full min-w-0 rounded border border-border bg-muted px-3 py-2 text-card-foreground" aria-label="Transaction category">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
@@ -145,41 +150,43 @@ export const SmartSearch = () => {
               </SelectContent>
             </Select>
             
-            <div className="flex space-x-2">
+            <div className="grid min-w-0 grid-cols-2 gap-2">
               <input
                 type="number"
-                placeholder="Min Amount"
+                placeholder="Min amount"
+                aria-label="Minimum amount"
                 value={filters.amountMin}
                 onChange={(e) => setFilters({ ...filters, amountMin: e.target.value })}
-                className="flex-1 bg-muted border border-border rounded px-3 py-2 text-card-foreground placeholder-muted-foreground"
+                className="min-w-0 rounded border border-border bg-muted px-2 py-2 text-card-foreground placeholder-muted-foreground sm:px-3"
               />
               <input
                 type="number"
-                placeholder="Max Amount"
+                placeholder="Max amount"
+                aria-label="Maximum amount"
                 value={filters.amountMax}
                 onChange={(e) => setFilters({ ...filters, amountMax: e.target.value })}
-                className="flex-1 bg-muted border border-border rounded px-3 py-2 text-card-foreground placeholder-muted-foreground"
+                className="min-w-0 rounded border border-border bg-muted px-2 py-2 text-card-foreground placeholder-muted-foreground sm:px-3"
               />
             </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1">From Date</label>
+            <div role="group" aria-label="From Date">
+              <p className="mb-1 text-sm text-muted-foreground">From Date</p>
               <DatePicker
                 value={filters.dateFrom ? new Date(filters.dateFrom) : null}
                 onChange={date => setFilters(f => ({ ...f, dateFrom: date.toISOString().slice(0, 10) }))}
                 placeholder="From Date"
-                className="w-full mb-2"
+                className="w-full"
               />
             </div>
-            <div>
-              <label className="block text-sm text-muted-foreground mb-1">To Date</label>
+            <div role="group" aria-label="To Date">
+              <p className="mb-1 text-sm text-muted-foreground">To Date</p>
               <DatePicker
                 value={filters.dateTo ? new Date(filters.dateTo) : null}
                 onChange={date => setFilters(f => ({ ...f, dateTo: date.toISOString().slice(0, 10) }))}
                 placeholder="To Date"
-                className="w-full mb-2"
+                className="w-full"
               />
             </div>
           </div>
@@ -201,9 +208,9 @@ export const SmartSearch = () => {
             <div className="divide-y divide-border">
               {filteredTransactions.map((transaction) => (
                 <div key={`${transaction.type}-${transaction.id}`} className="p-4 hover:bg-muted/70 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3">
+                  <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                         <span className={`px-2 py-1 text-xs rounded-full ${
                           transaction.type === 'income' 
                             ? 'bg-emerald-500/20 text-emerald-400' 
@@ -211,16 +218,16 @@ export const SmartSearch = () => {
                         }`}>
                           {transaction.type}
                         </span>
-                        <h4 className="text-card-foreground font-medium">
+                        <h4 className="min-w-0 break-words font-medium text-card-foreground">
                           {transaction.type === 'income' ? transaction.source : transaction.description}
                         </h4>
-                        <span className="text-sm text-muted-foreground">{transaction.category}</span>
+                        <span className="min-w-0 break-words text-sm text-muted-foreground">{transaction.category}</span>
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
                         {new Date(transaction.date).toLocaleDateString()}
                       </p>
                     </div>
-                    <span className={`text-lg font-bold ${
+                    <span className={`max-w-[45%] break-words text-right text-lg font-bold tabular-nums ${
                       transaction.type === 'income' ? 'text-emerald-400' : 'text-red-400'
                     }`}>
                       {transaction.type === 'income' ? '+' : '-'}<Money amount={transaction.amount} />

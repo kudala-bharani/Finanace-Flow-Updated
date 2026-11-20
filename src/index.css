@@ -121,6 +121,11 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+/* Keep the native date picker indicator visible in the dark theme. */
+.dark input[type="date"] {
+  color-scheme: dark;
+}
+
 /* Custom scrollbar for recent income container */
 .recent-income-scroll {
   scrollbar-width: thin;

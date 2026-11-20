@@ -36,6 +36,8 @@ import { EnhancedAnalytics } from "./components/EnhancedAnalytics";
 import { SmartSearch } from "./components/SmartSearch";
 
 import { Sidebar } from "./components/Sidebar";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { login, signup } from "./lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -58,9 +60,9 @@ function LoginForm() {
   const { toast } = useToast();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground">
-      <div className="bg-card border border-border rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-foreground sm:p-6">
+      <div className="bg-card border border-border rounded-xl shadow-lg p-6 w-full max-w-md sm:p-8">
+        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
         <form
           onSubmit={async (e) => {
             e.preventDefault();
@@ -86,18 +88,20 @@ function LoginForm() {
           <input
             type="email"
             placeholder="Email"
+            aria-label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+            className="h-10 w-full min-w-0 px-4 rounded border bg-muted text-foreground"
           />
           <input
             type="password"
             placeholder="Password"
+            aria-label="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+            className="h-10 w-full min-w-0 px-4 rounded border bg-muted text-foreground"
           />
           {error && (
             <div className="text-red-500 text-sm text-center">{error}</div>
@@ -161,41 +165,45 @@ function SignupForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground">
-      <div className="bg-card border border-border rounded-xl shadow-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-foreground sm:p-6">
+      <div className="bg-card border border-border rounded-xl shadow-lg p-6 w-full max-w-md sm:p-8">
+        <h1 className="text-2xl font-bold mb-6 text-center">Sign Up</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
             placeholder="Name"
+            aria-label="Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+            className="h-10 w-full min-w-0 px-4 rounded border bg-muted text-foreground"
           />
           <input
             type="email"
             placeholder="Email"
+            aria-label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+            className="h-10 w-full min-w-0 px-4 rounded border bg-muted text-foreground"
           />
           <input
             type="password"
             placeholder="Password"
+            aria-label="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+            className="h-10 w-full min-w-0 px-4 rounded border bg-muted text-foreground"
           />
           <input
             type="password"
             placeholder="Confirm Password"
+            aria-label="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
-            className="w-full px-4 py-2 rounded border bg-muted text-foreground"
+            className="h-10 w-full min-w-0 px-4 rounded border bg-muted text-foreground"
           />
           {error && (
             <div className="text-red-500 text-sm text-center">{error}</div>
@@ -228,6 +236,27 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const activeSection = location.pathname.split("/")[1] || "dashboard";
+  const sidebarProps = {
+    activeSection,
+    setActiveSection: (section: string) => navigate("/" + section),
+    setIsOpen: setIsSidebarOpen,
+    isCollapsed: isSidebarCollapsed,
+    setIsCollapsed: setIsSidebarCollapsed,
+  };
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => {
+      if (desktop.matches) setIsSidebarOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -260,46 +289,41 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   }, [navigate]);
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
-      <Sidebar
-        activeSection={location.pathname.replace("/", "") || "dashboard"}
-        setActiveSection={(section) => navigate("/" + section)}
-        isOpen={isSidebarOpen}
-        setIsOpen={setIsSidebarOpen}
-        isCollapsed={isSidebarCollapsed}
-        setIsCollapsed={setIsSidebarCollapsed}
-      />
-      <div className="flex-1 flex flex-col h-screen min-w-0">
-        <header className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-background">
+    <div className="flex h-screen bg-background text-foreground supports-[height:100dvh]:h-dvh">
+      <div className="hidden h-full shrink-0 lg:block">
+        <Sidebar {...sidebarProps} />
+      </div>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="flex shrink-0 items-center justify-between border-b border-border bg-background px-4 py-2 lg:hidden">
           <div className="flex items-center gap-2">
             <img
               src="https://cdn-icons-png.flaticon.com/512/10384/10384161.png"
-              alt="Logo"
+              alt=""
               className="w-6 h-6"
             />
             <span className="text-lg font-bold text-primary">Finance</span>
           </div>
-          <button
-            onClick={() => setIsSidebarOpen(true)}
-            className="p-2 rounded-lg hover:bg-muted"
-            aria-label="Open menu"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className="grid size-11 place-items-center rounded-lg hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label="Open menu"
+              >
+                <Menu className="size-6" aria-hidden="true" />
+              </button>
+            </SheetTrigger>
+            <SheetContent
+              side="left"
+              aria-describedby={undefined}
+              className="w-[min(18rem,calc(100%-2rem))] p-0 motion-reduce:data-[state=open]:animate-none motion-reduce:data-[state=closed]:animate-none [&>button:last-child]:right-2 [&>button:last-child]:top-2 [&>button:last-child]:grid [&>button:last-child]:size-10 [&>button:last-child]:place-items-center"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+              <SheetTitle className="sr-only">Navigation</SheetTitle>
+              <Sidebar {...sidebarProps} mobileFullscreen />
+            </SheetContent>
+          </Sheet>
         </header>
-        <main className="flex-1 overflow-y-auto h-full">
+        <main className="relative min-h-0 flex-1 overflow-y-auto">
           <div className="px-3 sm:px-4 lg:px-6 xl:px-8 py-3 sm:py-4 lg:py-6 xl:py-8 max-w-7xl w-full mx-auto">
             {children}
           </div>

@@ -58,7 +58,7 @@ export default function ContactPage() {
         </div>
 
         <div className="relative container mx-auto px-4 md:px-6 lg:px-8 py-12 lg:py-16">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center">
             {/* Left Content - Hero Text */}
             <div className="space-y-8">
               <div className="space-y-4">
@@ -83,7 +83,7 @@ export default function ContactPage() {
             </div>
 
             {/* Right Content - Contact Form */}
-            <div className="space-y-6 mt-4 lg:mt-8">
+            <div className="min-w-0 space-y-6">
               {isSubmitted && (
                 <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-emerald-500" />

@@ -21,7 +21,7 @@ import {
   Wallet,
   CreditCard,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 // import TiltImage from '@/components/TiltImage'; // Removed TiltImage import
 
@@ -127,6 +127,82 @@ const useCardTiltGlow = () => {
   return { cardRef, mousePosition, isHovering, tilt };
 };
 
+function FeaturePreview({ feature }: { feature: (typeof features)[number] }) {
+  const { cardRef, mousePosition, isHovering, tilt } = useCardTiltGlow();
+
+  return (
+    <div
+      ref={cardRef}
+      className="relative backdrop-blur-2xl bg-white/5 border border-white/30 rounded-3xl p-3 shadow-2xl transition-all duration-300 hover:border-white/50 hover:shadow-2xl hover:shadow-white/10 overflow-hidden"
+      style={
+        {
+          "--mouse-x": `${mousePosition.x}px`,
+          "--mouse-y": `${mousePosition.y}px`,
+          perspective: "1000px",
+          transform: `rotateX(${tilt.x}deg) rotateY(${
+            tilt.y
+          }deg) scale(${isHovering ? 1.04 : 1})`,
+          transition: isHovering
+            ? "transform 0.2s cubic-bezier(.03,.98,.52,.99)"
+            : "transform 0.3s cubic-bezier(.03,.98,.52,.99)",
+        } as React.CSSProperties
+      }
+    >
+      {/* Cursor glow overlay */}
+      {isHovering && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.1), transparent 40%)`,
+            zIndex: 1,
+          }}
+        />
+      )}
+      <div className="backdrop-blur-lg bg-white/3 border border-white/15 rounded-2xl p-4 relative z-10">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex gap-1">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          </div>
+          <div className="text-xs text-white/70 ml-2">
+            finance-app.com
+          </div>
+        </div>
+        {/* Actual screenshot */}
+        <div className="aspect-video rounded-xl overflow-hidden border border-white/20">
+          <img
+            src={feature.screenshot}
+            alt={`${feature.title} screenshot`}
+            className="w-full h-full object-cover rounded-xl"
+            onError={(e) => {
+              const image = e.currentTarget;
+              image.style.display = "none";
+              const placeholder = image.nextElementSibling;
+              if (placeholder instanceof HTMLElement) placeholder.style.display = "flex";
+            }}
+          />
+          {/* Fallback placeholder */}
+          <div className="aspect-video bg-gradient-to-br from-white/8 to-white/3 rounded-xl flex items-center justify-center hidden">
+            <div className="text-center space-y-4">
+              <div
+                className={`w-16 h-16 bg-${feature.color}-500/30 rounded-full flex items-center justify-center mx-auto backdrop-blur-sm`}
+              >
+                {feature.icon}
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 bg-white/20 rounded w-32 mx-auto"></div>
+                <div className="h-3 bg-white/10 rounded w-24 mx-auto"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>{" "}
+      {/* .backdrop-blur-lg ... */}
+    </div>
+  );
+}
+
 export default function HomePage() {
   const navigate = useNavigate();
 
@@ -146,8 +222,8 @@ export default function HomePage() {
           ></div>
         </div>
 
-        <div className="relative container mx-auto px-4 md:px-6 lg:px-8 py-16 lg:py-24">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center">
+        <div className="relative container mx-auto px-4 md:px-6 lg:px-8 py-10 sm:py-16 lg:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-8">
               <div className="space-y-4">
@@ -191,9 +267,9 @@ export default function HomePage() {
                 </Button>
               </div>
 
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <div className="grid grid-cols-2 items-center gap-x-4 gap-y-3 text-sm text-muted-foreground min-[480px]:grid-cols-4 lg:gap-x-6">
                 {benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center gap-2">
+                  <div key={index} className="flex min-w-0 items-center gap-2 [&>svg]:shrink-0">
                     {benefit.icon}
                     <span>{benefit.text}</span>
                   </div>
@@ -203,7 +279,7 @@ export default function HomePage() {
 
             {/* Right - Hero Image */}
             <div className="relative">
-              <div className="relative z-10 p-8">
+              <div className="relative z-10 p-2 sm:p-8">
                 <div className="aspect-square flex items-center justify-center overflow-hidden">
                   <img
                     src="/screenshots/hero/Revenue-pana.png"
@@ -221,9 +297,9 @@ export default function HomePage() {
       </section>
 
       {/* Features Sections */}
-      <section id="features-section" className="py-20 bg-background">
+      <section id="features-section" className="scroll-mt-24 py-12 sm:py-16 lg:py-20 bg-background">
         <div className="container mx-auto px-4 md:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               Everything You Need to Manage Your Money
             </h2>
@@ -233,15 +309,12 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="space-y-20 lg:space-y-24 xl:space-y-32">
+          <div className="space-y-12 sm:space-y-20 lg:space-y-24 xl:space-y-32">
             {features.map((feature, index) => {
-              const { cardRef, mousePosition, isHovering, tilt } =
-                useCardTiltGlow();
-
               return (
                 <div
-                  key={index}
-                  className={`grid lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center ${
+                  key={feature.title}
+                  className={`grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-center ${
                     index % 2 === 1 ? "lg:grid-flow-col-dense" : ""
                   }`}
                 >
@@ -279,74 +352,7 @@ export default function HomePage() {
                       index % 2 === 1 ? "lg:col-start-1" : ""
                     }`}
                   >
-                    <div
-                      ref={cardRef}
-                      className="relative backdrop-blur-2xl bg-white/5 border border-white/30 rounded-3xl p-3 shadow-2xl transition-all duration-300 hover:border-white/50 hover:shadow-2xl hover:shadow-white/10 overflow-hidden"
-                      style={
-                        {
-                          "--mouse-x": `${mousePosition.x}px`,
-                          "--mouse-y": `${mousePosition.y}px`,
-                          perspective: "1000px",
-                          transform: `rotateX(${tilt.x}deg) rotateY(${
-                            tilt.y
-                          }deg) scale(${isHovering ? 1.04 : 1})`,
-                          transition: isHovering
-                            ? "transform 0.2s cubic-bezier(.03,.98,.52,.99)"
-                            : "transform 0.3s cubic-bezier(.03,.98,.52,.99)",
-                        } as React.CSSProperties
-                      }
-                    >
-                      {/* Cursor glow overlay */}
-                      {isHovering && (
-                        <div
-                          className="absolute inset-0 pointer-events-none"
-                          style={{
-                            background: `radial-gradient(600px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.1), transparent 40%)`,
-                            zIndex: 1,
-                          }}
-                        />
-                      )}
-                      <div className="backdrop-blur-lg bg-white/3 border border-white/15 rounded-2xl p-4 relative z-10">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="flex gap-1">
-                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          </div>
-                          <div className="text-xs text-white/70 ml-2">
-                            finance-app.com
-                          </div>
-                        </div>
-                        {/* Actual screenshot */}
-                        <div className="aspect-video rounded-xl overflow-hidden border border-white/20">
-                          <img
-                            src={feature.screenshot}
-                            alt={`${feature.title} screenshot`}
-                            className="w-full h-full object-cover rounded-xl"
-                            onError={(e) => {
-                              // Fallback to placeholder if image fails to load
-                              e.target.style.display = "none";
-                              e.target.nextSibling.style.display = "flex";
-                            }}
-                          />
-                          {/* Fallback placeholder */}
-                          <div className="aspect-video bg-gradient-to-br from-white/8 to-white/3 rounded-xl flex items-center justify-center hidden">
-                            <div className="text-center space-y-4">
-                              <div
-                                className={`w-16 h-16 bg-${feature.color}-500/30 rounded-full flex items-center justify-center mx-auto backdrop-blur-sm`}
-                              >
-                                {feature.icon}
-                              </div>
-                              <div className="space-y-2">
-                                <div className="h-4 bg-white/20 rounded w-32 mx-auto"></div>
-                                <div className="h-3 bg-white/10 rounded w-24 mx-auto"></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>{" "}
-                      {/* .backdrop-blur-lg ... */}
-                    </div>{" "}
+                    <FeaturePreview feature={feature} />
                     {/* .relative (screenshot card) */}
                   </div>{" "}
                   {/* .grid (feature card row) */}
@@ -364,16 +370,16 @@ export default function HomePage() {
             <div>
               © {new Date().getFullYear()} FinanceFlow. All rights reserved.
             </div>
-            <div className="flex gap-6">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
               <a href="#" className="hover:text-foreground transition-colors">
                 Privacy Policy
               </a>
               <a href="#" className="hover:text-foreground transition-colors">
                 Terms of Service
               </a>
-              <a href="#" className="hover:text-foreground transition-colors">
+              <Link to="/contact" className="hover:text-foreground transition-colors">
                 Contact
-              </a>
+              </Link>
             </div>
           </div>
         </div>

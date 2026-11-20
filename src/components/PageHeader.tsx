@@ -14,25 +14,23 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ title, subtitle, actions
   const isDark = settings.theme === "dark" || (settings.theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   const toggleTheme = () => {
-    setSettings({ ...settings, theme: isDark ? "light" : "dark" } as any);
+    setSettings({ ...settings, theme: isDark ? "light" : "dark" });
   };
 
   return (
-    <div className="sticky top-0 z-20 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-      <div className="flex items-center justify-between px-3 sm:px-4 lg:px-6 xl:px-8 py-3 gap-3">
-        <div className="min-w-0">
-          <h1 className="text-2xl lg:text-3xl font-bold text-card-foreground truncate">{title}</h1>
+    <header className="top-0 z-20 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border lg:sticky">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 py-3 sm:flex sm:flex-wrap">
+        <div className="min-w-0 sm:mr-auto">
+          <h1 className="text-2xl lg:text-3xl font-bold text-card-foreground break-words">{title}</h1>
           {subtitle && (
-            <p className="text-sm text-muted-foreground truncate mt-1">{subtitle}</p>
+            <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>
           )}
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={toggleTheme}>
-            {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-          </Button>
-          {actions}
-        </div>
+        <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={toggleTheme}>
+          {isDark ? <Moon className="size-4" aria-hidden="true" /> : <Sun className="size-4" aria-hidden="true" />}
+        </Button>
+        {actions && <div className="col-span-2 min-w-0 max-w-full">{actions}</div>}
       </div>
-    </div>
+    </header>
   );
 };
