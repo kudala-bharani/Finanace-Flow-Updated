@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Plus, Target, Edit2, Trash2, Trophy } from 'lucide-react';
+import { Plus, Target, Edit2, Trash2, Trophy, X } from 'lucide-react';
 import { useFinanceData } from '@/hooks/useFinanceData';
 import { DatePicker } from "./ui/datepicker";
 import { Money } from "./Money";
@@ -122,7 +122,7 @@ export const SavingsGoals = () => {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {savingsGoals.map((goal) => {
             const progress = (goal.currentAmount / goal.targetAmount) * 100;
             const isComplete = progress >= 100;
@@ -132,76 +132,79 @@ export const SavingsGoals = () => {
                 key={goal.id}
                 className={
                   isComplete
-                    ? "relative rounded-lg p-6 transition-colors text-yellow-900 shadow-lg overflow-hidden border-2 border-yellow-400 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600"
-                    : "bg-slate-800 rounded-lg p-6 border border-slate-700 hover:border-slate-600 transition-colors"
+                    ? "relative min-w-0 overflow-hidden rounded-lg border-2 border-yellow-400 bg-gradient-to-br from-yellow-200 via-yellow-400 to-yellow-600 p-4 text-yellow-900 shadow-lg sm:p-6"
+                    : "min-w-0 rounded-lg border border-slate-700 bg-slate-800 p-4 transition-colors hover:border-slate-600 sm:p-6"
                 }
               >
-                {/* Gold shine animation overlay */}
                 {isComplete && (
-                  <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-lg">
-                    <div className="absolute -top-1/4 -left-1/4 w-[200%] h-[200%] animate-shine bg-gradient-to-r from-transparent via-white/60 to-transparent opacity-40 rotate-12" style={{filter: 'blur(8px)'}} />
+                  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-lg motion-reduce:hidden" aria-hidden="true">
+                    <div className="absolute -left-1/4 -top-1/4 h-[200%] w-[200%] rotate-12 animate-shine bg-gradient-to-r from-transparent via-white/60 to-transparent opacity-40 blur-[8px]" />
                   </div>
                 )}
                 {/* Achieved heading */}
                 {isComplete && (
                   <div className="mb-2 flex items-center justify-center">
-                    <span className="text-2xl font-extrabold text-black drop-shadow">Achieved</span>
+                    <span className="text-2xl font-bold text-yellow-900">Achieved</span>
                   </div>
                 )}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-2">
+                <div className="mb-4 flex items-start justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-2">
                     {isComplete ? (
-                      <Trophy className="w-6 h-6 text-yellow-600 drop-shadow" />
+                      <Trophy className="size-6 shrink-0 text-yellow-700" aria-hidden="true" />
                     ) : (
-                      <Target className="w-6 h-6 text-emerald-400" />
+                      <Target className="size-6 shrink-0 text-emerald-400" aria-hidden="true" />
                     )}
-                    <h3 className={isComplete ? "text-lg font-bold text-yellow-900" : "text-lg font-semibold text-white"}>{goal.name}</h3>
+                    <h3 className={isComplete ? "min-w-0 break-words text-lg font-bold text-yellow-900" : "min-w-0 break-words text-lg font-semibold text-white"}>{goal.name}</h3>
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex shrink-0 gap-1">
                     <button
+                      type="button"
+                      aria-label={`Edit ${goal.name}`}
                       onClick={() => handleEdit(goal)}
-                      className={isComplete ? "p-1 text-yellow-700 hover:text-blue-400 transition-colors" : "p-1 text-slate-400 hover:text-blue-400 transition-colors"}
+                      className={isComplete ? "grid size-11 place-items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:size-8 text-yellow-700 hover:text-blue-400 transition-colors" : "grid size-11 place-items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:size-8 text-slate-400 hover:text-blue-400 transition-colors"}
                       disabled={isComplete}
                       style={isComplete ? { display: 'none' } : {}}
                     >
-                      <Edit2 size={16} />
+                      <Edit2 size={16} aria-hidden="true" />
                     </button>
                     <button
+                      type="button"
+                      aria-label={`Delete ${goal.name}`}
                       onClick={() => handleDelete(goal.id)}
-                      className={isComplete ? "p-1 text-yellow-700 hover:text-red-400 transition-colors" : "p-1 text-slate-400 hover:text-red-400 transition-colors"}
+                      className={isComplete ? "grid size-11 place-items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:size-8 text-yellow-700 hover:text-red-400 transition-colors" : "grid size-11 place-items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:size-8 text-slate-400 hover:text-red-400 transition-colors"}
                     >
-                      <Trash2 size={16} />
+                      <Trash2 size={16} aria-hidden="true" />
                     </button>
                   </div>
                 </div>
                 
                 {goal.description && (
-                  <p className="text-slate-400 text-sm mb-4">{goal.description}</p>
+                  <p className={`mb-4 break-words text-sm ${isComplete ? "text-yellow-900" : "text-slate-400"}`}>{goal.description}</p>
                 )}
                 
                 <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm tabular-nums">
                     <span className={isComplete ? "text-yellow-800 font-semibold" : "text-slate-400"}>Progress</span>
                     <span className={isComplete ? "text-yellow-900 font-bold" : "text-white font-medium"}>{progress.toFixed(1)}%</span>
                   </div>
                   
                   <div className={isComplete ? "w-full bg-yellow-200 rounded-full h-2" : "w-full bg-slate-700 rounded-full h-2"}>
                     <div
-                      className={`h-2 rounded-full transition-all duration-300 ${isComplete ? 'bg-yellow-500' : 'bg-emerald-400'}`}
+                      className={`h-2 rounded-full ${isComplete ? 'bg-yellow-500' : 'bg-emerald-400'}`}
                       style={{ width: `${Math.min(progress, 100)}%` }}
                     />
                   </div>
                   
-                  <div className="flex justify-between text-sm">
+                  <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 text-sm tabular-nums">
                     <span className={isComplete ? "text-yellow-800 font-semibold" : "text-slate-400"}>
                       <Money amount={goal.currentAmount} /> / <Money amount={goal.targetAmount} />
                     </span>
-                    <span className={isComplete ? "font-bold text-yellow-700" : `font-medium ${daysLeft < 0 ? 'text-red-400' : 'text-slate-400'}`}>
+                    <span className={isComplete ? "font-bold text-yellow-900" : `font-medium ${daysLeft < 0 ? 'text-red-400' : 'text-slate-400'}`}>
                       {daysLeft < 0 ? `${Math.abs(daysLeft)} days overdue` : `${daysLeft} days left`}
                     </span>
                   </div>
                   {!isComplete && (
-                    <form className="flex space-x-2 mt-4" onSubmit={e => {
+                    <form className="mt-4 flex gap-2" onSubmit={e => {
                       e.preventDefault();
                       const amount = parseFloat(inputAmounts[goal.id] || "");
                       if (!isNaN(amount) && amount !== 0) {
@@ -221,12 +224,13 @@ export const SavingsGoals = () => {
                           }
                         }}
                         onKeyDown={e => { if (e.key === '-') e.preventDefault(); }}
-                        className="flex-1 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-emerald-400 placeholder-emerald-400 text-sm focus:outline-none"
+                        className="min-h-10 min-w-0 flex-1 rounded border border-slate-600 bg-slate-700 px-2 py-1 text-sm text-emerald-400 placeholder-emerald-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-400"
                         placeholder="Add amount"
+                        aria-label={`Add amount to ${goal.name}`}
                       />
                       <button
                         type="submit"
-                        className="bg-emerald-500/20 text-emerald-400 px-4 py-2 rounded text-sm hover:bg-emerald-500/30 transition-colors"
+                        className="shrink-0 rounded bg-emerald-500/20 px-4 py-2 text-sm text-emerald-400 transition-colors hover:bg-emerald-500/30"
                       >
                         Add
                       </button>
@@ -242,19 +246,19 @@ export const SavingsGoals = () => {
       {/* Form Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md border border-border shadow-xl relative">
+          <div className="relative w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-auto rounded-lg border border-border bg-card p-4 shadow-xl sm:p-6">
             <button
               className="absolute top-3 right-3 text-muted-foreground hover:text-foreground p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-400"
               onClick={resetForm}
               aria-label="Close"
             >
-              <span className="sr-only">Close</span>
-              <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <X size={24} aria-hidden="true" />
             </button>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">Goal Name</label>
+              <div className="pt-8 sm:pt-0">
+                <label htmlFor="goal-name" className="mb-2 block text-sm font-medium text-muted-foreground">Goal Name</label>
                 <input
+                  id="goal-name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -264,8 +268,9 @@ export const SavingsGoals = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">Target Amount</label>
+                <label htmlFor="goal-target" className="mb-2 block text-sm font-medium text-muted-foreground">Target Amount</label>
                 <input
+                  id="goal-target"
                   type="number"
                   step="0.01"
                   value={formData.targetAmount === 0 ? '' : formData.targetAmount}
@@ -283,8 +288,9 @@ export const SavingsGoals = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-2">Current Amount</label>
+                <label htmlFor="goal-current" className="mb-2 block text-sm font-medium text-muted-foreground">Current Amount</label>
                 <input
+                  id="goal-current"
                   type="number"
                   step="0.01"
                   value={formData.currentAmount === 0 ? '' : formData.currentAmount}

@@ -44,7 +44,7 @@ function toCSVSection(title, arr) {
 
 const Settings: React.FC = () => {
   const { settings, setSettings, resetSettings } = useContext(SettingsContext);
-  const { toast } = useToast ? useToast() : { toast: () => {} };
+  const { toast } = useToast();
 
   useEffect(() => {
     if (settings.theme === 'system') {
@@ -57,17 +57,17 @@ const Settings: React.FC = () => {
     }
   }, [settings.theme]);
 
-  const handleChange = (key: string, value: any) => {
+  function handleChange<Key extends keyof typeof settings>(key: Key, value: (typeof settings)[Key]) {
     setSettings({ ...settings, [key]: value });
-  };
+  }
 
   const handleSave = () => {
-    toast && toast({ title: 'Settings saved', description: 'Your preferences have been updated.' });
+    toast({ title: 'Settings saved', description: 'Your preferences have been updated.' });
   };
 
   const handleReset = () => {
     resetSettings();
-    toast && toast({ title: 'Settings reset', description: 'All settings have been reset to defaults.' });
+    toast({ title: 'Settings reset', description: 'All settings have been reset to defaults.' });
   };
 
   // Export logic
@@ -99,7 +99,7 @@ const Settings: React.FC = () => {
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
-        toast && toast({ title: 'Export Successful', description: 'Your data has been exported as JSON.' });
+        toast({ title: 'Export Successful', description: 'Your data has been exported as JSON.' });
       } else {
         // CSV
         let csv = '';
@@ -118,36 +118,38 @@ const Settings: React.FC = () => {
         a.click();
         a.remove();
         URL.revokeObjectURL(url);
-        toast && toast({ title: 'Export Successful', description: 'Your data has been exported as CSV.' });
+        toast({ title: 'Export Successful', description: 'Your data has been exported as CSV.' });
       }
     } catch (err) {
-      toast && toast({ title: 'Export Failed', description: 'Could not export your data. Please try again.', variant: 'destructive' });
+      toast({ title: 'Export Failed', description: 'Could not export your data. Please try again.', variant: 'destructive' });
     }
   };
 
   return (
-    <div className="w-full px-0 py-4 space-y-8">
-      <h1 className="text-3xl font-bold text-card-foreground mb-2 px-8 pt-2">Settings</h1>
-      <p className="text-muted-foreground mb-6 px-8">Manage your appearance, currency, and conversion preferences</p>
-      <div className="w-full flex flex-col gap-8">
+    <div className="w-full space-y-6 py-4 sm:space-y-8">
+      <div className="space-y-2 px-4 pt-2 sm:px-8">
+        <h1 className="text-3xl font-bold text-card-foreground">Settings</h1>
+        <p className="text-muted-foreground">Manage your appearance, currency, and conversion preferences</p>
+      </div>
+      <div className="flex w-full flex-col gap-6 sm:gap-8">
         {/* Appearance Section */}
         <Card className="w-full">
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
+          <CardHeader className="flex flex-row items-center gap-2 p-4 pb-2 sm:p-6 sm:pb-2">
             <Sun className="w-6 h-6 text-emerald-500" aria-hidden="true" />
             <CardTitle className="text-xl font-semibold leading-tight">Appearance</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 pt-0">
+          <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
             <div>
-              <label className="block font-semibold mb-1">Theme</label>
-              <div className="flex gap-2 mt-2 w-fit">
+              <p id="settings-theme-label" className="mb-1 font-semibold">Theme</p>
+              <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="settings-theme-label">
                 {themeOptions.map(opt => (
                   <button
                     key={opt.value}
                     type="button"
                     onClick={() => handleChange('theme', opt.value)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none
+                    className={`flex min-h-11 items-center gap-2 px-3 py-2 sm:px-4 rounded-lg border font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none
                       ${settings.theme === opt.value
-                        ? 'bg-emerald-500 text-white border-emerald-500 shadow'
+                        ? 'bg-emerald-500 text-white border-emerald-500'
                         : 'bg-muted hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800'}
                     `}
                     aria-pressed={settings.theme === opt.value}
@@ -164,15 +166,15 @@ const Settings: React.FC = () => {
         </Card>
         {/* Currency & Conversion Section */}
         <Card className="w-full">
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
+          <CardHeader className="flex flex-row items-center gap-2 p-4 pb-2 sm:p-6 sm:pb-2">
             <DollarSign className="w-6 h-6 text-emerald-500" aria-hidden="true" />
             <CardTitle className="text-xl font-semibold leading-tight">Currency & Conversion</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6 pt-0">
+          <CardContent className="space-y-6 p-4 pt-0 sm:p-6 sm:pt-0">
             <div>
-              <label className="block font-semibold mb-1">Preferred Currency</label>
+              <label htmlFor="settings-currency" className="mb-1 block font-semibold">Preferred Currency</label>
               <Select value={settings.preferredCurrency} onValueChange={v => handleChange('preferredCurrency', v)}>
-                <SelectTrigger className="w-full rounded-lg border focus:ring-2 focus:ring-emerald-400">
+                <SelectTrigger id="settings-currency" className="w-full rounded-lg border focus:ring-2 focus:ring-emerald-400">
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
                 <SelectContent>
@@ -185,21 +187,21 @@ const Settings: React.FC = () => {
             </div>
             <div className="flex items-center justify-between gap-4">
               <div>
-                <label className="font-semibold">Enable Currency Conversion</label>
+                <label htmlFor="conversionEnabled" className="font-semibold">Enable Currency Conversion</label>
                 <p className="text-xs text-muted-foreground mt-1">If enabled, you can hover over money to see the value in another currency.</p>
               </div>
               <Switch
                 checked={settings.conversionEnabled}
                 onCheckedChange={v => handleChange('conversionEnabled', v)}
-                className="data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted focus-visible:ring-2 focus-visible:ring-emerald-400"
+                className="shrink-0 data-[state=checked]:bg-emerald-500 data-[state=unchecked]:bg-muted focus-visible:ring-2 focus-visible:ring-emerald-400"
                 aria-label="Enable Currency Conversion"
                 id="conversionEnabled"
               />
             </div>
             <div>
-              <label className="block font-semibold mb-1">Conversion Target Currency</label>
+              <label htmlFor="settings-conversion-currency" className="mb-1 block font-semibold">Conversion Target Currency</label>
               <Select value={settings.conversionCurrency} onValueChange={v => handleChange('conversionCurrency', v)} disabled={!settings.conversionEnabled}>
-                <SelectTrigger className="w-full rounded-lg border focus:ring-2 focus:ring-emerald-400" disabled={!settings.conversionEnabled}>
+                <SelectTrigger id="settings-conversion-currency" className="w-full rounded-lg border focus:ring-2 focus:ring-emerald-400" disabled={!settings.conversionEnabled}>
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
                 <SelectContent>
@@ -214,15 +216,15 @@ const Settings: React.FC = () => {
         </Card>
         {/* Export Data Section */}
         <Card className="w-full">
-          <CardHeader className="flex flex-row items-center gap-2 pb-2">
+          <CardHeader className="flex flex-row items-center gap-2 p-4 pb-2 sm:p-6 sm:pb-2">
             <Download className="w-6 h-6 text-emerald-500" aria-hidden="true" />
             <CardTitle className="text-xl font-semibold leading-tight">Export Data</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 pt-0">
+          <CardContent className="space-y-4 p-4 pt-0 sm:p-6 sm:pt-0">
             <p className="text-muted-foreground mb-2">Export all your finance data for backup or use elsewhere. You can choose JSON or CSV format.</p>
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-2 sm:gap-4">
               <button
-                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors shadow focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white min-h-11 px-4 py-2.5 sm:px-5 rounded-lg font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
                 type="button"
                 onClick={() => handleExport('json')}
                 aria-label="Export as JSON"
@@ -231,7 +233,7 @@ const Settings: React.FC = () => {
                 Export as JSON
               </button>
               <button
-                className="flex items-center gap-2 bg-muted hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-600 dark:text-emerald-400 px-5 py-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors font-semibold shadow focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+                className="flex items-center gap-2 bg-muted hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-600 dark:text-emerald-400 min-h-11 px-4 py-2.5 sm:px-5 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors font-semibold shadow focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
                 type="button"
                 onClick={() => handleExport('csv')}
                 aria-label="Export as CSV"
@@ -243,9 +245,9 @@ const Settings: React.FC = () => {
           </CardContent>
         </Card>
         {/* Save/Reset Buttons */}
-        <div className="flex gap-4 mt-8 justify-end px-8 pb-4">
+        <div className="flex flex-wrap justify-end gap-2 px-4 pb-4 sm:gap-4 sm:px-8">
           <button
-            className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-lg font-semibold transition-colors shadow focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+            className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white min-h-11 px-4 py-2.5 sm:px-5 rounded-lg font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
             type="button"
             onClick={handleSave}
             aria-label="Save Settings"
@@ -254,7 +256,7 @@ const Settings: React.FC = () => {
             Save Settings
           </button>
           <button
-            className="flex items-center gap-2 bg-muted hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-600 dark:text-emerald-400 px-5 py-2.5 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors font-semibold shadow focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
+            className="flex items-center gap-2 bg-muted hover:bg-emerald-100 dark:hover:bg-emerald-900 text-emerald-600 dark:text-emerald-400 min-h-11 px-4 py-2.5 sm:px-5 rounded-lg border border-emerald-200 dark:border-emerald-800 transition-colors font-semibold shadow focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:outline-none"
             type="button"
             onClick={handleReset}
             aria-label="Reset to Defaults"
@@ -268,4 +270,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default Settings; 
+export default Settings;

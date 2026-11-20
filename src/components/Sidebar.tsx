@@ -11,7 +11,6 @@ import {
   LineChart,
   Sun,
   Moon,
-  DollarSign,
   PanelLeft,
   PanelLeftOpen,
   Settings as SettingsIcon,
@@ -25,16 +24,14 @@ import {
 } from "@/components/ui/tooltip";
 import { useContext } from "react";
 import { SettingsContext } from "../lib/SettingsContext";
-import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   activeSection: string;
   setActiveSection: (section: string) => void;
-  isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   isCollapsed: boolean;
   setIsCollapsed: (collapsed: boolean) => void;
-  // When true, render a full-screen mobile-friendly menu (no side sheet)
+  // When true, render a full-width navigation inside the mobile drawer
   mobileFullscreen?: boolean;
   // When true, hide the built-in header (useful when parent renders its own)
   hideHeader?: boolean;
@@ -100,7 +97,6 @@ const menuItems = [
 export const Sidebar = ({
   activeSection,
   setActiveSection,
-  isOpen,
   setIsOpen,
   isCollapsed,
   setIsCollapsed,
@@ -115,7 +111,6 @@ export const Sidebar = ({
   const handleThemeToggle = () => {
     setSettings({ ...settings, theme: isDark ? "light" : "dark" });
   };
-  const navigate = useNavigate();
   const handleLogout = () => {
     localStorage.removeItem("user_settings");
     localStorage.removeItem("signup_name");
@@ -127,7 +122,7 @@ export const Sidebar = ({
   return (
     <TooltipProvider>
       <aside
-        className={`bg-background border-r border-border flex flex-col h-screen ${
+        className={`bg-background border-r border-border flex h-full min-h-0 flex-col ${
           mobileFullscreen ? "w-full" : isCollapsed ? "w-10 lg:w-12" : "w-48 lg:w-56"
         }`}
         aria-label="Sidebar navigation"
@@ -170,7 +165,7 @@ export const Sidebar = ({
                       onClick={() => setIsCollapsed(true)}
                       className="ml-2 p-1 lg:p-1.5 rounded-lg hover:bg-muted transition-colors"
                     >
-                      <PanelLeft size={18} className="lg:w-4 lg:h-4" />
+                      <PanelLeft size={16} aria-hidden="true" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent
@@ -188,7 +183,7 @@ export const Sidebar = ({
                       onClick={() => setIsCollapsed(false)}
                       className="p-1 lg:p-1.5 rounded-lg hover:bg-muted transition-colors"
                     >
-                      <PanelLeftOpen size={18} className="lg:w-4 lg:h-4" />
+                      <PanelLeftOpen size={16} aria-hidden="true" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent
@@ -203,16 +198,15 @@ export const Sidebar = ({
           </div>
         )}
 
-        {/* Menu items - non-scrollable, fixed height */}
         <nav
-          className={`flex flex-col gap-0.5 py-2 lg:py-3 flex-1 px-2 lg:px-3 ${
+          className={`flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto py-2 lg:py-3 px-2 lg:px-3 ${
             mobileFullscreen ? "items-stretch" : isCollapsed ? "items-center" : "items-stretch"
           }`}
         >
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
-            const baseBtn = `flex items-center w-full h-9 lg:h-10 my-0.5 rounded-lg transition-all duration-200 ${
+            const baseBtn = `flex shrink-0 items-center w-full h-10 my-0.5 rounded-lg transition-colors duration-200 ${
               !mobileFullscreen && isCollapsed ? "justify-center" : "gap-2.5 px-2"
             }`;
             const activeStyles = isActive
@@ -230,9 +224,11 @@ export const Sidebar = ({
                       setIsOpen(false);
                     }}
                     aria-label={item.label}
+                    aria-current={isActive ? "page" : undefined}
                   >
                     <Icon
-                      className={`w-4 h-4 lg:w-4 lg:h-4 ${item.color} flex-shrink-0`}
+                      aria-hidden="true"
+                      className={`size-4 ${item.color} shrink-0`}
                     />
                     {(!(!mobileFullscreen && isCollapsed)) && (
                       <span className="text-sm font-medium truncate">
@@ -280,9 +276,9 @@ export const Sidebar = ({
                 aria-label="Toggle theme"
               >
                 {isDark ? (
-                  <Moon size={18} className="lg:w-4 lg:h-4" />
+                  <Moon size={16} aria-hidden="true" />
                 ) : (
-                  <Sun size={18} className="lg:w-4 lg:h-4" />
+                  <Sun size={16} aria-hidden="true" />
                 )}
                 {(!(!mobileFullscreen && isCollapsed)) && (
                   <span className="text-sm">Theme</span>
@@ -308,7 +304,7 @@ export const Sidebar = ({
                 }`}
                 aria-label="Logout"
               >
-                <LogOutIcon size={18} className="lg:w-4 lg:h-4" />
+                <LogOutIcon size={16} aria-hidden="true" />
                 {(!(!mobileFullscreen && isCollapsed)) && (
                   <span className="text-sm">Logout</span>
                 )}

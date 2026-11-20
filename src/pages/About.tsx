@@ -29,8 +29,8 @@ export default function AboutPage() {
           ></div>
         </div>
 
-        <div className="relative container mx-auto px-4 md:px-6 lg:px-8 py-16 lg:py-24">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center">
+        <div className="relative container mx-auto px-4 md:px-6 lg:px-8 py-10 sm:py-16 lg:py-24">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 xl:gap-12 items-center">
             {/* Left Content */}
             <div className="space-y-8">
               <div className="space-y-4">
@@ -86,7 +86,7 @@ export default function AboutPage() {
             </div>
 
             {/* Right - Profile Card */}
-            <div className="flex justify-center">
+            <div className="flex min-w-0 justify-center [&>div]:max-w-full [&>div>div]:max-w-full">
               <TiltImage
                 src="/screenshots/creator/hero.jpg"
                 alt="Bharani Kudala"
@@ -98,9 +98,9 @@ export default function AboutPage() {
       </section>
 
       {/* About Content */}
-      <section className="py-16 lg:py-20">
+      <section className="py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
-          <div className="text-center mb-16">
+          <div className="text-center mb-10 sm:mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold mb-4">
               About This Project
             </h2>
@@ -114,7 +114,6 @@ export default function AboutPage() {
             <ParticleCard
               enableTilt={true}
               enableMagnetism={true}
-              enableBorderGlow={true}
               clickEffect={true}
               particleCount={12}
               glowColor="132, 0, 255"
@@ -136,7 +135,6 @@ export default function AboutPage() {
             <ParticleCard
               enableTilt={true}
               enableMagnetism={true}
-              enableBorderGlow={true}
               clickEffect={true}
               particleCount={12}
               glowColor="132, 0, 255"
@@ -158,7 +156,6 @@ export default function AboutPage() {
             <ParticleCard
               enableTilt={true}
               enableMagnetism={true}
-              enableBorderGlow={true}
               clickEffect={true}
               particleCount={12}
               glowColor="132, 0, 255"
@@ -182,7 +179,6 @@ export default function AboutPage() {
           <ParticleCard
             enableTilt={true}
             enableMagnetism={true}
-            enableBorderGlow={true}
             clickEffect={true}
             particleCount={12}
             glowColor="132, 0, 255"

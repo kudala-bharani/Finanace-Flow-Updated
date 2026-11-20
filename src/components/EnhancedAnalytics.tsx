@@ -137,14 +137,13 @@ export const EnhancedAnalytics = () => {
   const prediction = predictMonthEnd();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <PageHeader
         title="Enhanced Analytics"
         subtitle="Advanced charts and trends for deeper financial analysis"
-        breadcrumbs={[{ label: 'Home', href: '/dashboard' }, { label: 'Enhanced Analytics' }]}
       />
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
         <SummaryCard
           icon={<Target className="w-7 h-7" />}
           title="Savings Rate"
@@ -166,15 +165,15 @@ export const EnhancedAnalytics = () => {
       </div>
 
       {/* Income vs Expenses Trend */}
-      <div className="bg-card rounded-lg p-6 border border-border">
+      <div className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-6">
         <h2 className="text-xl font-semibold text-card-foreground mb-4">6-Month Financial Trend</h2>
-        <div className="h-80">
+        <div className="h-64 min-w-0 sm:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="month" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" />
-              <Tooltip content={<CustomChartTooltip />} />
+              <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} minTickGap={12} />
+              <YAxis stroke="#9ca3af" fontSize={12} width={48} />
+              <Tooltip content={CustomChartTooltip} />
               <Line type="monotone" dataKey="income" stroke="#10B981" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2, fill: '#fff' }} />
               <Line type="monotone" dataKey="expenses" stroke="#EF4444" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6, stroke: '#EF4444', strokeWidth: 2, fill: '#fff' }} />
               <Line type="monotone" dataKey="savings" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2, fill: '#fff' }} />
@@ -184,15 +183,15 @@ export const EnhancedAnalytics = () => {
       </div>
 
       {/* Category Spending Trends */}
-      <div className="bg-card rounded-lg p-6 border border-border">
+      <div className="min-w-0 rounded-lg border border-border bg-card p-4 sm:p-6">
         <h2 className="text-xl font-semibold text-card-foreground mb-4">Category Spending Trends</h2>
-        <div className="h-80">
+        <div className="h-64 min-w-0 sm:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="month" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" />
-              <Tooltip content={<CustomChartTooltip />} cursor={{ fill: 'rgba(16,185,129,0.08)' }} />
+              <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} minTickGap={12} />
+              <YAxis stroke="#9ca3af" fontSize={12} width={48} />
+              <Tooltip content={CustomChartTooltip} cursor={{ fill: 'rgba(16,185,129,0.08)' }} />
               {/* Remove default activeBar by not setting activeBar prop, and use a subtle cursor color */}
               <Bar dataKey="Food & Dining" fill="#F59E0B" radius={[6, 6, 0, 0]} />
               <Bar dataKey="Transport" fill="#3B82F6" radius={[6, 6, 0, 0]} />

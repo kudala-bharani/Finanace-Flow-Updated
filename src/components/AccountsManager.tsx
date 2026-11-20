@@ -25,42 +25,42 @@ const sectionStyles = {
   bank: {
     card: "border-border bg-card",
     header: "text-blue-400",
-    icon: <Wallet className="w-5 h-5 text-blue-400" />,
+    icon: <Wallet className="w-5 h-5 shrink-0 text-blue-400" />,
     summary: "bg-muted border-border text-blue-400",
     money: "text-blue-400",
   },
   credit: {
     card: "border-border bg-card",
     header: "text-red-400",
-    icon: <CreditCard className="w-5 h-5 text-red-400" />,
+    icon: <CreditCard className="w-5 h-5 shrink-0 text-red-400" />,
     summary: "bg-muted border-border text-red-400",
     money: "text-red-400",
   },
   cash: {
     card: "border-border bg-card",
     header: "text-green-400",
-    icon: <Banknote className="w-5 h-5 text-green-400" />,
+    icon: <Banknote className="w-5 h-5 shrink-0 text-green-400" />,
     summary: "bg-muted border-border text-green-400",
     money: "text-green-400",
   },
   coins: {
     card: "border-border bg-card",
     header: "text-yellow-400",
-    icon: <Coins className="w-5 h-5 text-yellow-400" />,
+    icon: <Coins className="w-5 h-5 shrink-0 text-yellow-400" />,
     summary: "bg-muted border-border text-yellow-400",
     money: "text-yellow-400",
   },
   given: {
     card: "border-border bg-card",
     header: "text-purple-400",
-    icon: <Users className="w-5 h-5 text-purple-400" />,
+    icon: <Users className="w-5 h-5 shrink-0 text-purple-400" />,
     summary: "bg-muted border-border text-purple-400",
     money: "text-purple-400",
   },
   taken: {
     card: "border-border bg-card",
     header: "text-pink-400",
-    icon: <Users className="w-5 h-5 text-pink-400" />,
+    icon: <Users className="w-5 h-5 shrink-0 text-pink-400" />,
     summary: "bg-muted border-border text-pink-400",
     money: "text-pink-400",
   },
@@ -207,17 +207,17 @@ export const AccountsManager = () => {
   // Helper for summary card
   const summaryCard = (type, count, total, label, icon, colorClass) => (
     <div
-      className={`rounded-xl border-2 border-border bg-card p-4 flex flex-col items-start min-w-[160px] shadow-sm hover:shadow-md transition-shadow`}
+      className={`rounded-xl border-2 border-border bg-card p-4 flex flex-col items-start min-w-0 [overflow-wrap:anywhere] shadow-sm hover:shadow-md transition-shadow`}
     >
       <div className="flex items-center gap-2 mb-2">
         {icon}
         <span className="font-semibold text-lg">{label}</span>
       </div>
       <div className="text-xs mb-1 text-muted-foreground">
-        {count} {label.toLowerCase()}
+        {count} {type === "given" || type === "taken" ? "transaction" : label.toLowerCase()}
         {count !== 1 ? "s" : ""}
       </div>
-      <div className="text-2xl font-bold text-foreground">
+      <div className="text-2xl font-bold tabular-nums text-foreground">
         <Money amount={total} />
       </div>
     </div>
@@ -228,7 +228,6 @@ export const AccountsManager = () => {
       <PageHeader
         title="Accounts"
         subtitle="Manage bank, cash, coins and friend balances"
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Accounts" }]}
       />
 
       {/* Top summary cards */}
@@ -284,7 +283,7 @@ export const AccountsManager = () => {
       </div>
 
       {/* Overall total */}
-      <div className="mt-2 mb-4 text-2xl font-bold text-center">
+      <div className="text-center text-2xl font-bold tabular-nums [overflow-wrap:anywhere]">
         Total:{" "}
         <span className="text-emerald-400">
           <Money amount={totalBalance} />
@@ -302,13 +301,15 @@ export const AccountsManager = () => {
             <button
               className={`w-7 h-7 flex items-center justify-center rounded-full shadow ${sectionAccent.bank} hover:brightness-110 transition`}
               onClick={() => openAddModal("Bank Account")}
+              type="button"
+              aria-label="Add Bank Account"
               title="Add Bank Account"
             >
               <Plus size={16} className="text-white" />
             </button>
           </div>
           <div
-            className={`flex items-center gap-2 mb-4 text-lg font-semibold ${sectionStyles.bank.header}`}
+            className={`mb-4 flex min-h-7 items-center gap-2 pr-9 text-lg font-semibold ${sectionStyles.bank.header}`}
           >
             {sectionStyles.bank.icon} Bank Accounts
           </div>
@@ -318,29 +319,33 @@ export const AccountsManager = () => {
             bankAccounts.map((account) => (
               <div
                 key={account.id}
-                className="flex items-center justify-between bg-muted rounded-lg px-4 py-3 mb-2"
+                className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg bg-muted px-3 py-3 sm:px-4"
               >
-                <div>
+                <div className="min-w-0 flex-[1_1_6rem] [overflow-wrap:anywhere]">
                   <div className="font-semibold">{account.name}</div>
                   <div className="text-xs text-muted-foreground">
                     Bank Account
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-1">
                   <div
-                    className={`text-lg font-bold ${sectionStyles.bank.money}`}
+                    className={`text-right text-lg font-bold tabular-nums [overflow-wrap:anywhere] ${sectionStyles.bank.money}`}
                   >
                     <Money amount={account.balance} />
                   </div>
                   <button
                     onClick={() => handleEdit(account)}
-                    className="text-muted-foreground hover:text-blue-400"
+                    type="button"
+                    aria-label={"Edit " + account.name}
+                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-blue-400"
                   >
                     <Edit2 size={18} />
                   </button>
                   <button
                     onClick={() => handleDelete(account.id)}
-                    className="text-muted-foreground hover:text-red-400"
+                    type="button"
+                    aria-label={"Delete " + account.name}
+                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-red-400"
                   >
                     <Trash2 size={18} />
                   </button>
@@ -357,13 +362,15 @@ export const AccountsManager = () => {
             <button
               className={`w-7 h-7 flex items-center justify-center rounded-full shadow ${sectionAccent.credit} hover:brightness-110 transition`}
               onClick={() => openAddModal("Credit Card")}
+              type="button"
+              aria-label="Add Credit Card"
               title="Add Credit Card"
             >
               <Plus size={16} className="text-white" />
             </button>
           </div>
           <div
-            className={`flex items-center gap-2 mb-4 text-lg font-semibold ${sectionStyles.credit.header}`}
+            className={`mb-4 flex min-h-7 items-center gap-2 pr-9 text-lg font-semibold ${sectionStyles.credit.header}`}
           >
             {sectionStyles.credit.icon} Credit Accounts
           </div>
@@ -373,29 +380,33 @@ export const AccountsManager = () => {
             creditCards.map((account) => (
               <div
                 key={account.id}
-                className="flex items-center justify-between bg-muted rounded-lg px-4 py-3 mb-2"
+                className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg bg-muted px-3 py-3 sm:px-4"
               >
-                <div>
+                <div className="min-w-0 flex-[1_1_6rem] [overflow-wrap:anywhere]">
                   <div className="font-semibold">{account.name}</div>
                   <div className="text-xs text-muted-foreground">
                     Credit Card
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-1">
                   <div
-                    className={`text-lg font-bold ${sectionStyles.credit.money}`}
+                    className={`text-right text-lg font-bold tabular-nums [overflow-wrap:anywhere] ${sectionStyles.credit.money}`}
                   >
                     <Money amount={account.balance} />
                   </div>
                   <button
                     onClick={() => handleEdit(account)}
-                    className="text-muted-foreground hover:text-blue-400"
+                    type="button"
+                    aria-label={"Edit " + account.name}
+                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-blue-400"
                   >
                     <Edit2 size={18} />
                   </button>
                   <button
                     onClick={() => handleDelete(account.id)}
-                    className="text-muted-foreground hover:text-red-400"
+                    type="button"
+                    aria-label={"Delete " + account.name}
+                    className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-red-400"
                   >
                     <Trash2 size={18} />
                   </button>
@@ -414,6 +425,8 @@ export const AccountsManager = () => {
               <button
                 className={`w-7 h-7 flex items-center justify-center rounded-full shadow ${sectionAccent.cash} hover:brightness-110 transition`}
                 onClick={() => openAddModal("Cash")}
+                type="button"
+                aria-label="Add Cash Account"
                 title="Add Cash Account"
               >
                 <Plus size={16} className="text-white" />
@@ -421,33 +434,37 @@ export const AccountsManager = () => {
             </div>
           )}
           <div
-            className={`flex items-center gap-2 mb-4 text-lg font-semibold ${sectionStyles.cash.header}`}
+            className={`mb-4 flex min-h-7 items-center gap-2 pr-9 text-lg font-semibold ${sectionStyles.cash.header}`}
           >
             {sectionStyles.cash.icon} Cash Accounts
           </div>
           {!cashAccount ? (
             <div className="text-muted-foreground">No cash accounts yet</div>
           ) : (
-            <div className="flex items-center justify-between bg-muted rounded-lg px-4 py-3 mb-2">
-              <div>
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg bg-muted px-3 py-3 sm:px-4">
+              <div className="min-w-0 flex-[1_1_6rem] [overflow-wrap:anywhere]">
                 <div className="font-semibold">{cashAccount.name}</div>
                 <div className="text-xs text-muted-foreground">Cash</div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-1">
                 <div
-                  className={`text-lg font-bold ${sectionStyles.cash.money}`}
+                  className={`text-right text-lg font-bold tabular-nums [overflow-wrap:anywhere] ${sectionStyles.cash.money}`}
                 >
                   <Money amount={cashAccount.balance} />
                 </div>
                 <button
                   onClick={() => handleEdit(cashAccount)}
-                  className="text-muted-foreground hover:text-blue-400"
+                  type="button"
+                  aria-label={"Edit " + cashAccount.name}
+                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-blue-400"
                 >
                   <Edit2 size={18} />
                 </button>
                 <button
                   onClick={() => handleDelete(cashAccount.id)}
-                  className="text-muted-foreground hover:text-red-400"
+                  type="button"
+                  aria-label={"Delete " + cashAccount.name}
+                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-red-400"
                 >
                   <Trash2 size={18} />
                 </button>
@@ -464,6 +481,8 @@ export const AccountsManager = () => {
               <button
                 className={`w-7 h-7 flex items-center justify-center rounded-full shadow ${sectionAccent.coins} hover:brightness-110 transition`}
                 onClick={() => openAddModal("Coins")}
+                type="button"
+                aria-label="Add Coins Account"
                 title="Add Coins Account"
               >
                 <Plus size={16} className="text-white" />
@@ -471,33 +490,37 @@ export const AccountsManager = () => {
             </div>
           )}
           <div
-            className={`flex items-center gap-2 mb-4 text-lg font-semibold ${sectionStyles.coins.header}`}
+            className={`mb-4 flex min-h-7 items-center gap-2 pr-9 text-lg font-semibold ${sectionStyles.coins.header}`}
           >
             {sectionStyles.coins.icon} Coins Accounts
           </div>
           {!coinsAccount ? (
             <div className="text-muted-foreground">No coins accounts yet</div>
           ) : (
-            <div className="flex items-center justify-between bg-muted rounded-lg px-4 py-3 mb-2">
-              <div>
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg bg-muted px-3 py-3 sm:px-4">
+              <div className="min-w-0 flex-[1_1_6rem] [overflow-wrap:anywhere]">
                 <div className="font-semibold">{coinsAccount.name}</div>
                 <div className="text-xs text-muted-foreground">Coins</div>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-1">
                 <div
-                  className={`text-lg font-bold ${sectionStyles.coins.money}`}
+                  className={`text-right text-lg font-bold tabular-nums [overflow-wrap:anywhere] ${sectionStyles.coins.money}`}
                 >
                   <Money amount={coinsAccount.balance} />
                 </div>
                 <button
                   onClick={() => handleEdit(coinsAccount)}
-                  className="text-muted-foreground hover:text-blue-400"
+                  type="button"
+                  aria-label={"Edit " + coinsAccount.name}
+                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-blue-400"
                 >
                   <Edit2 size={18} />
                 </button>
                 <button
                   onClick={() => handleDelete(coinsAccount.id)}
-                  className="text-muted-foreground hover:text-red-400"
+                  type="button"
+                  aria-label={"Delete " + coinsAccount.name}
+                  className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:text-red-400"
                 >
                   <Trash2 size={18} />
                 </button>
@@ -520,16 +543,16 @@ export const AccountsManager = () => {
             groupedMoneyGiven.map((tx) => (
               <div
                 key={tx.id}
-                className="flex items-center justify-between bg-muted rounded-lg px-4 py-3 mb-2"
+                className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg bg-muted px-3 py-3 sm:px-4"
               >
-                <div>
+                <div className="min-w-0 flex-[1_1_6rem] [overflow-wrap:anywhere]">
                   <div className="font-semibold">{tx.name}</div>
                   <div className="text-xs text-muted-foreground">
                     To Receive
                   </div>
                 </div>
                 <div
-                  className={`text-lg font-bold ${sectionStyles.given.money}`}
+                  className={`text-right text-lg font-bold tabular-nums [overflow-wrap:anywhere] ${sectionStyles.given.money}`}
                 >
                   <Money amount={tx.amount} />
                 </div>
@@ -552,14 +575,14 @@ export const AccountsManager = () => {
             groupedMoneyTaken.map((tx) => (
               <div
                 key={tx.id}
-                className="flex items-center justify-between bg-muted rounded-lg px-4 py-3 mb-2"
+                className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg bg-muted px-3 py-3 sm:px-4"
               >
-                <div>
+                <div className="min-w-0 flex-[1_1_6rem] [overflow-wrap:anywhere]">
                   <div className="font-semibold">{tx.name}</div>
                   <div className="text-xs text-muted-foreground">To Give</div>
                 </div>
                 <div
-                  className={`text-lg font-bold ${sectionStyles.taken.money}`}
+                  className={`text-right text-lg font-bold tabular-nums [overflow-wrap:anywhere] ${sectionStyles.taken.money}`}
                 >
                   <Money amount={tx.amount} />
                 </div>
@@ -571,8 +594,8 @@ export const AccountsManager = () => {
 
       {/* Add/Edit Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md border border-border shadow-xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3">
+          <div className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-card p-4 shadow-xl sm:p-6">
             <button
               className="absolute top-3 right-3 text-muted-foreground hover:text-foreground p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-400"
               onClick={resetForm}
@@ -581,7 +604,7 @@ export const AccountsManager = () => {
               <X size={28} />
             </button>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-2">
+              <h3 className="mb-2 pr-10 text-lg font-semibold">
                 {editingAccount
                   ? `Edit ${formData.type}`
                   : addType
@@ -592,6 +615,7 @@ export const AccountsManager = () => {
               {requiresName(formData.type) && (
                 <input
                   type="text"
+                  aria-label="Account Name"
                   placeholder="Account Name"
                   value={formData.name}
                   onChange={(e) =>
@@ -604,6 +628,8 @@ export const AccountsManager = () => {
               <input
                 type="number"
                 step="0.01"
+                aria-label="Balance"
+                inputMode="decimal"
                 placeholder="Balance"
                 value={formData.balance}
                 onFocus={(e) => {

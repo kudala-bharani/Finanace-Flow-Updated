@@ -9,7 +9,7 @@ import {
   X,
 } from "lucide-react";
 import { useFinanceData, Income } from "@/hooks/useFinanceData";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -191,6 +191,14 @@ export const IncomeTracker = () => {
     .reduce((sum, income) => sum + income.amount, 0);
 
   const totalPieData = getPieData(incomes);
+  const sourceColors = new Map(
+    totalPieData.map(({ name }, index) => [
+      name,
+      PIE_COLORS[index % PIE_COLORS.length],
+    ])
+  );
+  const getSourceColor = (source: string) =>
+    sourceColors.get(source) ?? PIE_COLORS[0];
   const monthPieData = getPieData(
     incomes.filter((income) => {
       const date = new Date(income.date);
@@ -228,14 +236,14 @@ export const IncomeTracker = () => {
       <PageHeader
         title="Income"
         subtitle="Track your earnings and income sources"
-        breadcrumbs={[{ label: "Home", href: "/dashboard" }, { label: "Income" }]}
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
           <button
+            type="button"
             onClick={() => setIsFormOpen(true)}
             className="flex items-center space-x-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg transition-colors"
           >
-            <Plus size={20} />
+            <Plus size={20} aria-hidden="true" />
             <span>Add Income</span>
           </button>
           <Dialog open={isSourcesOpen} onOpenChange={setIsSourcesOpen}>
@@ -244,15 +252,15 @@ export const IncomeTracker = () => {
                 <span>Manage Sources</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-xl p-0 overflow-hidden">
+            <DialogContent className="max-h-[calc(100dvh-1.5rem)] w-11/12 max-w-xl overflow-y-auto rounded-lg p-0" aria-describedby={undefined}>
               <div className="w-full bg-card rounded-lg">
-                <div className="flex items-center gap-2 px-6 pt-6 pb-2 border-b border-border">
+                <div className="flex items-center gap-2 px-4 pb-2 pt-6 pr-12 border-b border-border sm:px-6 sm:pr-12">
                   <TrendingUp className="w-5 h-5 text-emerald-400" />
-                  <h2 className="text-lg font-bold text-card-foreground">
+                  <DialogTitle className="text-lg font-bold leading-normal text-card-foreground">
                     Manage Income Sources
-                  </h2>
+                  </DialogTitle>
                 </div>
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
@@ -269,8 +277,9 @@ export const IncomeTracker = () => {
                     <input
                       value={newSource}
                       onChange={(e) => setNewSource(e.target.value)}
+                      aria-label="Add new source"
                       placeholder="Add new source"
-                      className="flex-1 px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-emerald-400 outline-none transition shadow-sm"
+                      className="min-w-0 flex-1 px-4 py-2 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-emerald-400 outline-none transition shadow-sm"
                     />
                     <button
                       type="submit"
@@ -283,7 +292,7 @@ export const IncomeTracker = () => {
                     {incomeSources.map((src, idx) => (
                       <li
                         key={src}
-                        className="flex items-center bg-muted rounded-full px-4 py-2 shadow-sm group border border-border cursor-grab"
+                        className="flex items-center min-w-0 bg-muted rounded-full px-3 py-2 shadow-sm group sm:px-4 border border-border cursor-grab"
                         draggable
                         onDragStart={() => handleDragStart(idx)}
                         onDragEnter={() => handleDragEnter(idx)}
@@ -292,11 +301,12 @@ export const IncomeTracker = () => {
                       >
                         <GripVertical className="w-4 h-4 mr-2 text-muted-foreground opacity-60 cursor-grab" />
                         {editingIndex === idx ? (
-                          <div className="flex items-center gap-2 flex-1">
+                          <div className="flex min-w-0 flex-1 items-center gap-2">
                             <input
+                              aria-label="Edit source name"
                               value={editingValue}
                               onChange={(e) => setEditingValue(e.target.value)}
-                              className="px-2 py-1 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-emerald-400 outline-none text-sm flex-1"
+                              className="px-2 py-1 rounded-full border border-border text-foreground bg-background focus:ring-2 focus:ring-emerald-400 outline-none text-sm w-0 min-w-0 flex-1"
                               autoFocus
                             />
                             <button
@@ -324,7 +334,7 @@ export const IncomeTracker = () => {
                           </div>
                         ) : (
                           <>
-                            <span className="font-medium text-card-foreground text-sm mr-2 flex-1">
+                            <span className="font-medium min-w-0 text-card-foreground text-sm mr-2 flex-1 [overflow-wrap:anywhere]">
                               {src}
                             </span>
                             <TooltipProvider>
@@ -374,32 +384,34 @@ export const IncomeTracker = () => {
           </div>
         }
       />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 mt-4">
+      <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 lg:gap-6 mt-4">
         <SummaryCard
           icon={<TrendingUp className="w-7 h-7" />}
           title="This Month"
           value={<Money amount={currentMonthIncome} />}
           color="blue"
+          className="min-w-0 gap-3 p-4 tabular-nums sm:gap-4 sm:p-6 [&>div:last-child]:min-w-0 [&>div:last-child]:break-words"
         />
         <SummaryCard
           icon={<TrendingUp className="w-7 h-7" />}
           title="Total Income"
           value={<Money amount={totalIncome} />}
           color="emerald"
+          className="min-w-0 gap-3 p-4 tabular-nums sm:gap-4 sm:p-6 [&>div:last-child]:min-w-0 [&>div:last-child]:break-words"
         />
       </div>
 
       {/* Pie Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-card rounded-lg border border-border p-6 flex flex-col items-center">
-          <h3 className="font-semibold text-card-foreground mb-4">
+      <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2 lg:gap-6 lg:mb-8">
+        <div className="flex min-w-0 flex-col items-center rounded-lg border border-border bg-card p-4 sm:p-6">
+          <h3 className="mb-4 text-center font-semibold text-card-foreground">
             This Month by Source
           </h3>
-          <div className="w-full">
+          <div className="w-full min-w-0 max-sm:[&_.apexcharts-datalabel-value]:!text-sm">
             <PieChartApex
               series={monthPieData.map((d) => d.value)}
               labels={monthPieData.map((d) => d.name)}
-              colors={PIE_COLORS}
+              colors={monthPieData.map(({ name }) => getSourceColor(name))}
               height={270}
               totalLabel="This Month"
               totalFormatter={(sum) =>
@@ -411,15 +423,15 @@ export const IncomeTracker = () => {
             />
           </div>
         </div>
-        <div className="bg-card rounded-lg border border-border p-6 flex flex-col items-center">
-          <h3 className="font-semibold text-card-foreground mb-4">
+        <div className="flex min-w-0 flex-col items-center rounded-lg border border-border bg-card p-4 sm:p-6">
+          <h3 className="mb-4 text-center font-semibold text-card-foreground">
             Total Income by Source
           </h3>
-          <div className="w-full">
+          <div className="w-full min-w-0 max-sm:[&_.apexcharts-datalabel-value]:!text-sm">
             <PieChartApex
               series={totalPieData.map((d) => d.value)}
               labels={totalPieData.map((d) => d.name)}
-              colors={PIE_COLORS}
+              colors={totalPieData.map(({ name }) => getSourceColor(name))}
               height={270}
               totalLabel="Total Income"
               totalFormatter={(sum) =>
@@ -435,12 +447,12 @@ export const IncomeTracker = () => {
 
       {/* Income List */}
       <div className="bg-card rounded-lg border border-border">
-        <div className="p-6 border-b border-border">
+        <div className="border-b border-border px-4 py-4 sm:px-6">
           <h2 className="text-xl font-semibold text-card-foreground">
             Recent Income
           </h2>
         </div>
-        <div className="divide-y divide-border max-h-[400px] overflow-y-auto">
+        <div className="max-h-[400px] space-y-2 overflow-y-auto p-2">
           {incomes.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground flex flex-col items-center">
               <TrendingUp className="w-16 h-16 mb-4 opacity-40" />
@@ -450,7 +462,7 @@ export const IncomeTracker = () => {
               <p className="text-base">Add your first income to get started!</p>
             </div>
           ) : (
-            incomes
+            [...incomes]
               .sort((a, b) => {
                 const dateDiff =
                   new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -459,31 +471,26 @@ export const IncomeTracker = () => {
                 return (Number(b.id) || 0) - (Number(a.id) || 0);
               })
               .map((income) => {
-                // Find the color index from totalPieData to match the pie chart
-                const colorIdx = totalPieData.findIndex(
-                  (d) => d.name === income.source
-                );
-                const dotColor =
-                  PIE_COLORS[colorIdx % PIE_COLORS.length] || PIE_COLORS[0];
+                const dotColor = getSourceColor(income.source);
                 return (
                   <div
                     key={income.id}
-                    className="flex flex-col md:flex-row md:items-center justify-between gap-2 p-4 rounded-xl bg-muted/60 hover:bg-muted transition shadow-sm m-2"
+                    className="flex flex-col justify-between gap-2 rounded-xl bg-muted/60 p-3 shadow-sm transition-colors hover:bg-muted md:flex-row md:items-center sm:p-4"
                   >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 md:flex-nowrap md:gap-3">
                       <span
                         className="inline-block w-3 h-3 rounded-full flex-shrink-0"
                         style={{ backgroundColor: dotColor }}
                       />
-                      <span className="font-semibold text-card-foreground text-base truncate">
+                      <span className="min-w-0 flex-1 text-base font-semibold text-card-foreground [overflow-wrap:anywhere]">
                         {income.source}
                       </span>
-                      <span className="text-xs text-muted-foreground ml-2 hidden md:inline">
+                      <span className="hidden w-24 shrink-0 text-right text-xs text-muted-foreground md:inline">
                         {new Date(income.date).toLocaleDateString()}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 md:gap-6">
-                      <span className="text-xl font-bold text-emerald-500 md:text-2xl">
+                    <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 md:w-[min(17rem,42%)] md:shrink-0 md:justify-end md:gap-4">
+                      <span className="text-xl font-bold tabular-nums text-emerald-500 [overflow-wrap:anywhere] md:text-2xl">
                         +<Money amount={income.amount} />
                       </span>
                       <div className="flex gap-1">
@@ -493,7 +500,7 @@ export const IncomeTracker = () => {
                               <button
                                 onClick={() => handleEdit(income)}
                                 className="p-2 rounded-full hover:bg-emerald-100 dark:hover:bg-emerald-900 text-muted-foreground hover:text-primary transition"
-                                aria-label="Edit"
+                                aria-label={"Edit " + income.source}
                               >
                                 <Edit2 size={18} />
                               </button>
@@ -505,7 +512,7 @@ export const IncomeTracker = () => {
                               <button
                                 onClick={() => handleDelete(income.id)}
                                 className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 text-muted-foreground hover:text-red-500 transition"
-                                aria-label="Delete"
+                                aria-label={"Delete " + income.source}
                               >
                                 <Trash2 size={18} />
                               </button>
@@ -527,8 +534,8 @@ export const IncomeTracker = () => {
 
       {/* Form Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md border border-border shadow-xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3">
+          <div className="relative max-h-[calc(100dvh-1.5rem)] w-full max-w-md overflow-y-auto rounded-lg border border-border bg-card p-4 shadow-xl sm:p-6">
             <button
               className="absolute top-3 right-3 text-muted-foreground hover:text-foreground p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-400"
               onClick={resetForm}
@@ -537,7 +544,7 @@ export const IncomeTracker = () => {
               <X size={28} />
             </button>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-2">
+              <h3 className="mb-2 pr-10 text-lg font-semibold">
                 {editingIncome ? "Edit Income" : "Add Income"}
               </h3>
               <Select
@@ -547,7 +554,7 @@ export const IncomeTracker = () => {
                 }
                 required
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full" aria-label="Select source">
                   <SelectValue placeholder="Select source" />
                 </SelectTrigger>
                 <SelectContent>
@@ -560,7 +567,9 @@ export const IncomeTracker = () => {
               </Select>
               <input
                 type="number"
+                inputMode="decimal"
                 step="0.01"
+                aria-label="Amount"
                 placeholder="Amount"
                 value={formData.amount === 0 ? "" : formData.amount}
                 onFocus={(e) => {
@@ -611,7 +620,7 @@ export const IncomeTracker = () => {
           if (!open && !deleteLoading) setDeleteId(null);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="w-11/12 rounded-lg p-4 sm:p-6">
           <AlertDialogTitle>Delete Income</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this income entry? This action

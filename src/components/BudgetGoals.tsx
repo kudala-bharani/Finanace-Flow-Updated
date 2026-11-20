@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Target, X } from "lucide-react";
-import { useFinanceData, BudgetGoal } from "@/hooks/useFinanceData";
+import { Plus, Edit2, Trash2, Target, TriangleAlert, X } from "lucide-react";
+import { useFinanceData, type BudgetGoal, type Expense } from "@/hooks/useFinanceData";
 import { useExpenseCategories } from "../hooks/useExpenseCategories";
 import {
   Select,
@@ -55,7 +55,7 @@ function getPreviousMonthYear() {
 }
 
 // Helper to get previous month spending for a category
-function getPreviousMonthSpending(category: string, expenses: any[]) {
+function getPreviousMonthSpending(category: string, expenses: Expense[]) {
   const { month, year } = getPreviousMonthYear();
   return expenses
     .filter((expense) => {
@@ -86,7 +86,7 @@ function CircularProgress({
   const clamped = Math.min(percent, 100);
   const strokeDashoffset = circumference - (clamped / 100) * circumference;
   return (
-    <svg height={radius * 2} width={radius * 2}>
+    <svg height={radius * 2} width={radius * 2} aria-hidden="true">
       <circle
         stroke={overBudget ? "#f87171" : "#e5e7eb"}
         fill="transparent"
@@ -224,8 +224,8 @@ export const BudgetGoals = () => {
   const handleDelete = async (category: string) => {
     if (confirm("Are you sure you want to delete this budget goal?")) {
       const goal = budgetGoals.find((g) => g.category === category);
-      if (goal && (goal as any).id) {
-        await removeBudgetGoal((goal as any).id);
+      if (goal?.id) {
+        await removeBudgetGoal(goal.id);
       }
     }
   };
@@ -333,11 +333,11 @@ export const BudgetGoals = () => {
 
       {/* Previous Month Summary */}
       {previousGoals.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-xl font-bold mb-3">
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold">
             Last Month's Budget Summary ({previousMonthLabel})
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {previousGoals.map((goal) => {
               const percentage = (goal.spent / goal.amount) * 100;
               const isOverBudget = goal.spent > goal.amount;
@@ -345,41 +345,42 @@ export const BudgetGoals = () => {
               return (
                 <div
                   key={goal.category + "-prev"}
-                  className="bg-card rounded-lg border flex flex-col items-center p-4 shadow-sm relative"
+                  className="min-w-0 bg-card rounded-lg border flex flex-col items-center gap-2 p-3 sm:p-4 text-center"
                   style={{ borderColor: color }}
                 >
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex min-w-0 items-center justify-center gap-2">
                     <span
-                      className="inline-block w-3 h-3 rounded"
+                      className="inline-block size-3 shrink-0 rounded"
+                      aria-hidden="true"
                       style={{ background: color }}
                     />
-                    <span className="font-semibold text-sm" style={{ color }}>
+                    <span className="break-words text-sm font-semibold" style={{ color }}>
                       {goal.category}
                     </span>
                   </div>
-                  <div className="mb-2">
+                  <div>
                     <CircularProgress
                       percent={percentage}
                       color={color}
                       overBudget={isOverBudget}
                     />
                   </div>
-                  <div className="text-xs text-muted-foreground mb-1">
+                  <div className="break-words text-xs text-muted-foreground tabular-nums">
                     <Money amount={goal.spent} /> /{" "}
                     <Money amount={goal.amount} />
                   </div>
                   <div
-                    className={`text-sm font-bold ${
+                    className={`flex flex-wrap items-center justify-center gap-2 text-sm font-bold tabular-nums ${
                       isOverBudget ? "text-red-500" : "text-card-foreground"
                     }`}
                   >
                     {percentage.toFixed(0)}%
+                    {isOverBudget && (
+                      <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
+                        Over
+                      </span>
+                    )}
                   </div>
-                  {isOverBudget && (
-                    <span className="absolute top-2 right-2 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">
-                      Over
-                    </span>
-                  )}
                 </div>
               );
             })}
@@ -389,7 +390,7 @@ export const BudgetGoals = () => {
 
       {/* This Month's Budget Goals Heading */}
       {currentMonthGoals.length > 0 && (
-        <h2 className="text-xl font-bold mb-3">This Month's Budget Goals</h2>
+        <h2 className="text-xl font-bold">This Month's Budget Goals</h2>
       )}
 
       {/* Budget Goals List */}
@@ -418,7 +419,7 @@ export const BudgetGoals = () => {
             return (
               <div
                 key={goal.category}
-                className="rounded-lg p-6 border"
+                className="rounded-lg border p-4 sm:p-6"
                 style={{
                   borderColor: getCategoryColor(goal.category, categories),
                   background: hexToRgba(
@@ -427,8 +428,8 @@ export const BudgetGoals = () => {
                   ),
                 }}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div>
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                  <div className="min-w-0 break-words">
                     <h3
                       className="text-lg font-semibold"
                       style={{
@@ -441,8 +442,8 @@ export const BudgetGoals = () => {
                       Spent: <Money amount={goal.spent} />
                     </p>
                   </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-right">
+                  <div className="ml-auto flex items-center gap-2 sm:gap-4">
+                    <div className="text-right tabular-nums">
                       <p
                         className={`text-lg font-bold ${
                           isOverBudget ? "text-red-400" : "text-card-foreground"
@@ -454,16 +455,20 @@ export const BudgetGoals = () => {
                         <Money amount={goal.amount - goal.spent} /> left
                       </p>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex shrink-0 gap-1 sm:gap-2">
                       <button
+                        type="button"
+                        aria-label={`Edit ${goal.category} budget`}
                         onClick={() => handleEdit(goal)}
-                        className="p-2 text-muted-foreground hover:text-primary transition-colors"
+                        className="grid size-11 place-items-center rounded-md text-muted-foreground transition-colors hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:size-8"
                       >
                         <Edit2 size={16} />
                       </button>
                       <button
+                        type="button"
+                        aria-label={`Delete ${goal.category} budget`}
                         onClick={() => handleDelete(goal.category)}
-                        className="p-2 text-muted-foreground hover:text-red-400 transition-colors"
+                        className="grid size-11 place-items-center rounded-md text-muted-foreground transition-colors hover:text-red-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring sm:size-8"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -473,7 +478,7 @@ export const BudgetGoals = () => {
                 {/* Progress Bar */}
                 <div className="w-full bg-muted rounded-full h-3">
                   <div
-                    className={`h-3 rounded-full transition-all duration-300 ${getProgressColor(
+                    className={`h-3 rounded-full ${getProgressColor(
                       goal.spent,
                       goal.amount
                     )}`}
@@ -485,9 +490,9 @@ export const BudgetGoals = () => {
                 {/* Over Budget Warning */}
                 {isOverBudget && (
                   <div className="mt-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                    <p className="text-red-400 text-sm font-medium">
-                      ⚠️ Over budget by{" "}
-                      <Money amount={goal.spent - goal.amount} />
+                    <p className="flex items-start gap-2 text-sm font-medium text-red-400">
+                      <TriangleAlert className="mt-0.5 shrink-0" size={16} aria-hidden="true" />
+                      <span>Over budget by <Money amount={goal.spent - goal.amount} /></span>
                     </p>
                   </div>
                 )}
@@ -499,8 +504,8 @@ export const BudgetGoals = () => {
 
       {/* Modern Modal for Add/Edit Budget Goal */}
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-card rounded-lg p-6 w-full max-w-md border border-border shadow-xl relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="relative w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-auto rounded-lg border border-border bg-card p-4 shadow-xl sm:p-6">
             <button
               className="absolute top-3 right-3 text-muted-foreground hover:text-foreground p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
               onClick={resetForm}
@@ -509,7 +514,7 @@ export const BudgetGoals = () => {
               <X size={28} />
             </button>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <h3 className="text-lg font-semibold mb-2">
+              <h3 className="mb-2 pr-10 text-lg font-semibold">
                 {editingGoal ? "Edit Budget Goal" : "Set Budget Goal"}
               </h3>
               <Select
@@ -519,7 +524,7 @@ export const BudgetGoals = () => {
                 }
                 disabled={!!editingGoal}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full" aria-label="Budget category">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -539,6 +544,7 @@ export const BudgetGoals = () => {
                 type="number"
                 step="0.01"
                 placeholder="Budget Amount"
+                aria-label="Budget amount"
                 value={formData.amount === 0 ? "" : formData.amount}
                 onFocus={(e) => {
                   if (e.target.value === "0") e.target.value = "";
